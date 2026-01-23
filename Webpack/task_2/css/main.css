@@ -1,0 +1,17 @@
+/* Logo en haut */
+#logo {
+    width: 200px;
+    height: 200px;
+    background: url('../assets/holberton-logo.jpg') no-repeat;
+    /* motif attendu */
+    background-size: 200px 200px;
+    margin-bottom: 16px;
+}
+
+/* Compteur : à droite du bouton et en gras */
+#count {
+    font-weight: bold;
+    margin-left: 10px;
+    /* place le texte à droite du bouton */
+    vertical-align: middle;
+}
