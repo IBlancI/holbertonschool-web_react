@@ -9,7 +9,7 @@ export default function Notifications() {
   };
 
   return (
-    <div className="notifications">
+    <div className="notification-items">
       {/* Bouton Close */}
       <button
         aria-label="Close"
