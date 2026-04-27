@@ -1,150 +1,103 @@
-import React from 'react';
-import { StyleSheet, css } from 'aphrodite';
-import closeIcon from '../assets/close-icon.png';
-import NotificationItem from './NotificationItem';
+import { Component } from "react";
+import PropTypes from "prop-types";
+import closeButton from "../assets/close-button.png";
+import NotificationItem from "./NotificationItem.jsx";
 
-const opacityKeyframes = {
-  'from': {
-    opacity: 0.5
-  },
-  'to': {
-    opacity: 1
-  }
-};
-
-const bounceKeyframes = {
-  '0%': {
-    transform: 'translateY(0px)'
-  },
-  '50%': {
-    transform: 'translateY(-5px)'
-  },
-  '100%': {
-    transform: 'translateY(5px)'
-  }
-};
-
-const styles = StyleSheet.create({
-  notificationItems: {
-    position: 'relative',
-    border: '3px dotted #e1003c',
-    padding: '5px',
-    fontFamily: 'Roboto, sans-serif',
-    width: '25%',
-    float: 'right',
-    marginTop: '20px',
-    '@media (max-width: 900px)': {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      border: 'none',
-      padding: 0,
-      margin: 0,
-      fontSize: '20px',
-      backgroundColor: 'white',
-      zIndex: 1000
-    }
-  },
-  ul: {
-    '@media (max-width: 900px)': {
-      padding: 0
-    }
-  },
-  p: {
-    margin: 0,
-    '@media (max-width: 900px)': {
-      fontSize: '20px'
-    }
-  },
-  button: {
-    position: 'absolute',
-    cursor: 'pointer',
-    right: 'calc(0% - 480px)',
-    top: 'calc(0% - 480px)',
-    background: 'transparent',
-    transform: 'scale(0.012)',
-    WebkitTransform: 'scale(0.012)',
-    MozTransform: 'scale(0.012)',
-    msTransform: 'scale(0.012)',
-    OTransform: 'scale(0.012)'
-  },
-  menuItem: {
-    float: 'right',
-    position: 'absolute',
-    right: '10px',
-    top: '-5px',
-    backgroundColor: '#fff8f8',
-    cursor: 'pointer',
-    ':hover': {
-      animationName: [opacityKeyframes, bounceKeyframes],
-      animationDuration: '1s, 0.5s',
-      animationIterationCount: '3, 3'
-    }
-  }
-});
-
-class Notifications extends React.Component {
-  constructor(props) {
-    super(props)
+class Notifications extends Component {
+  // Optimize performance: only update when notifications list length or displayDrawer changes
+  shouldComponentUpdate(nextProps) {
+    // Compare the length of the notifications array
+    const currentLength = this.props.notifications?.length || 0;
+    const nextLength = nextProps.notifications?.length || 0;
+    
+    // Compare displayDrawer prop
+    const displayDrawerChanged = this.props.displayDrawer !== nextProps.displayDrawer;
+    
+    // Re-render if length changed OR displayDrawer changed
+    return currentLength !== nextLength || displayDrawerChanged;
   }
 
   markAsRead = (id) => {
     console.log(`Notification ${id} has been marked as read`);
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return (
-      this.props.notifications.length !== nextProps.notifications.length ||
-      this.props.displayDrawer !== nextProps.displayDrawer
-    );
-  }
+  };
 
   render() {
-    const { notifications = [], displayDrawer, handleDisplayDrawer, handleHideDrawer } = this.props;
+    const { notifications = [], displayDrawer = false, handleDisplayDrawer } = this.props;
+    const hasNotifications = notifications && notifications.length > 0;
+    
+    // Add bounce animation when there are notifications AND drawer is closed
+    const shouldBounce = hasNotifications && !displayDrawer;
+    const titleClasses = `notification-title text-right text-sm md:text-base cursor-pointer ${shouldBounce ? 'animate-bounce' : ''}`;
 
     return (
-      <>
-        <div className={css(styles.menuItem)} onClick={() => handleDisplayDrawer()}>
+      <div className="notifications-root">
+        {/* Title "Your Notifications" positioned at right and on top - click to show drawer */}
+        <div 
+          className={titleClasses}
+          onClick={handleDisplayDrawer}
+        >
           Your notifications
         </div>
-        {
-          displayDrawer ? (
-            <div className={css(styles.notificationItems)}>
-              {notifications.length > 0 ? (
-                <>
-                  <p className={css(styles.p)}>Here is the list of notifications</p>
-                  <button
-                    onClick={() => handleHideDrawer()}
-                    aria-label='Close'
-                    className={css(styles.button)}
-                  >
-                    <img src={closeIcon} alt='close icon' />
-                  </button>
-                  <ul className={css(styles.ul)}>
-                    {notifications.map((notification) => (
-                      <NotificationItem
-                        id={notification.id}
-                        key={notification.id}
-                        type={notification.type}
-                        value={notification.value}
-                        html={notification.html}
-                        markAsRead={this.markAsRead}
-                      />
-                    ))}
-                  </ul>
-                </>
-              ) : (
-                <p className={css(styles.p)}>No new notification for now</p>
-              )}
-            </div>
-          ) :
-          ([])
-        }
-      </>
+
+        {displayDrawer && (
+          <div 
+            className="notification-items flex flex-col items-start justify-start p-4 px-6 mb-6 relative bg-white box-border gap-3 border-2 border-dashed max-[912px]:fixed max-[912px]:top-0 max-[912px]:left-0 max-[912px]:w-screen max-[912px]:h-screen max-[912px]:z-50 max-[912px]:border-none max-[912px]:p-2"
+            style={{ borderColor: 'var(--main-color)' }}
+          >
+            <button
+              className="notification-close-button self-end bg-transparent border-none cursor-pointer p-0"
+              type="button"
+              aria-label="Close"
+              onClick={() => {
+                console.log("Close button has been clicked");
+                // Call handleHideDrawer if it exists (for backward compatibility with existing tests)
+                if (this.props.handleHideDrawer) {
+                  this.props.handleHideDrawer();
+                }
+              }}
+            >
+              <img
+                className="notification-close-icon w-3 h-3"
+                src={closeButton}
+                alt="Close"
+              />
+            </button>
+
+            {hasNotifications ? (
+              <>
+                <p className="m-0 font-medium text-[#333] text-sm md:text-base">Here is the list of notifications</p>
+                <ul className="m-0 pl-5 list-disc max-[912px]:list-none max-[912px]:pl-0 w-full">
+                  {notifications.map((notification) => (
+                    <NotificationItem
+                      key={notification.id}
+                      {...notification}
+                      markAsRead={this.markAsRead}
+                    />
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p className="m-0 font-medium text-[#333] text-sm md:text-base">No new notification for now</p>
+            )}
+          </div>
+        )}
+      </div>
     );
   }
 }
 
-export default Notifications
+Notifications.propTypes = {
+  displayDrawer: PropTypes.bool,
+  notifications: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      type: PropTypes.string,
+      value: PropTypes.string,
+      html: PropTypes.shape({ __html: PropTypes.string }),
+    })
+  ),
+  handleDisplayDrawer: PropTypes.func,
+  handleHideDrawer: PropTypes.func,
+};
+
+export default Notifications;

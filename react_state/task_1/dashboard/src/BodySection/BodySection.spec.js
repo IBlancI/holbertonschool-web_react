@@ -1,28 +1,21 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import BodySection from './BodySection';
 
-test('It should render a heading with the title prop value', () => {
-  render(
-    <BodySection title="Test Title">
-      <p>Test child</p>
-    </BodySection>
-  );
+describe('BodySection', () => {
+  test('renders a heading with the title prop value', () => {
+    render(<BodySection title="test title" />);
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('test title');
+  });
 
-  const titleElement = screen.getByRole('heading', { name: /test title/i });
-  expect(titleElement).toBeInTheDocument();
-  expect(titleElement.tagName).toBe('H2');
-});
+  test('renders the children passed to it', () => {
+    render(
+      <BodySection title="test title">
+        <p>test children node</p>
+      </BodySection>
+    );
 
-test('It should render any number of children passed to it', () => {
-  render(
-    <BodySection title="Test Title">
-      <p>Child 1</p>
-      <p>Child 2</p>
-      <p>Child 3</p>
-    </BodySection>
-  );
-
-  expect(screen.getByText('Child 1')).toBeInTheDocument();
-  expect(screen.getByText('Child 2')).toBeInTheDocument();
-  expect(screen.getByText('Child 3')).toBeInTheDocument();
+    expect(screen.getByText('test children node')).toBeInTheDocument();
+  });
 });

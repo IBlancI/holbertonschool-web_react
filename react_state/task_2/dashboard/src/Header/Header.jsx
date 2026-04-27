@@ -1,32 +1,12 @@
-import { StyleSheet, css } from 'aphrodite';
 import logo from '../assets/holberton-logo.jpg';
 
-const styles = StyleSheet.create({
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  logo: {
-    height: '30vmin',
-    pointerEvents: 'none'
-  },
-  h1: {
-    color: '#e1003c',
-    fontFamily: 'Roboto, sans-serif',
-    fontWeight: 'bold',
-    fontSize: '2.5rem',
-    margin: 0
-  }
-});
-
-function Header() {
+export default function Header() {
   return (
-    <div className={css(styles.header)}>
-      <img src={logo} className={css(styles.logo)} alt="holberton logo" />
-      <h1 className={css(styles.h1)}>School Dashboard</h1>
+    <div className="App-header flex items-center py-2 max-[520px]:flex-col">
+      <img src={logo} className="App-logo h-60 pointer-events-none max-[520px]:h-60" alt="holberton logo" />
+      <h1 className="font-bold text-[color:var(--main-color)] text-5xl max-[520px]:text-5xl max-[520px]:mt-2 max-[435px]:text-4xl">
+        School Dashboard
+      </h1>
     </div>
-  )
+  );
 }
-
-export default Header;
