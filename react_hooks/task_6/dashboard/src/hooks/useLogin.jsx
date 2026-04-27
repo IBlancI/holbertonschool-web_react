@@ -1,50 +1,44 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
-export default function useLogin(onLogin) {
-  const [enableSubmit, setEnableSubmit] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+function useLogin(onLogin) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [enableSubmit, setEnableSubmit] = useState(false)
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const isValidEmail = (value) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/
+    return emailRegex.test(value)
+  }
 
-  const handleChangeEmail = (e) => {
-    const newEmail = e.target.value;
-    const { password } = formData;
-    
-    setFormData(prev => ({
-      ...prev,
-      email: newEmail
-    }));
-    setEnableSubmit(validateEmail(newEmail) && password.length >= 8);
-  };
+  const validateForm = (currentEmail, currentPassword) => {
+    return isValidEmail(currentEmail) && currentPassword.length >= 8
+  }
 
-  const handleChangePassword = (e) => {
-    const newPassword = e.target.value;
-    const { email } = formData;
-    
-    setFormData(prev => ({
-      ...prev,
-      password: newPassword
-    }));
-    setEnableSubmit(validateEmail(email) && newPassword.length >= 8);
-  };
+  const handleChangeEmail = (event) => {
+    const updatedEmail = event.target.value
+    setEmail(updatedEmail)
+    setEnableSubmit(validateForm(updatedEmail, password))
+  }
 
-  const handleLoginSubmit = (e) => {
-    e.preventDefault();
-    onLogin(formData.email, formData.password);
-  };
+  const handleChangePassword = (event) => {
+    const updatedPassword = event.target.value
+    setPassword(updatedPassword)
+    setEnableSubmit(validateForm(email, updatedPassword))
+  }
+
+  const handleLoginSubmit = (event) => {
+    event.preventDefault()
+    onLogin(email, password)
+  }
 
   return {
-    email: formData.email,
-    password: formData.password,
+    email,
+    password,
     enableSubmit,
     handleChangeEmail,
     handleChangePassword,
-    handleLoginSubmit
-  };
+    handleLoginSubmit,
+  }
 }
+
+export default useLogin

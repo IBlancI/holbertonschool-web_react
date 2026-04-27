@@ -1,54 +1,47 @@
-import { PureComponent } from 'react';
-import { StyleSheet, css } from 'aphrodite';
-
-const styles = StyleSheet.create({
-  default: {
-    color: 'blue',
-    '@media (max-width: 900px)': {
-      width: '100%',
-      borderBottom: '1px solid black',
-      fontSize: '20px',
-      padding: '10px 8px',
-      listStyle: 'none'
-    }
-  },
-  urgent: {
-    color: 'red',
-    '@media (max-width: 900px)': {
-      width: '100%',
-      borderBottom: '1px solid black',
-      fontSize: '20px',
-      padding: '10px 8px',
-      listStyle: 'none'
-    }
-  }
-});
+import { PureComponent } from 'react'
+import { getLatestNotification } from '../utils/utils'
 
 class NotificationItem extends PureComponent {
-
-  render() {
-    const { type, html, value, markAsRead, id } = this.props;
-    const itemStyle = type === 'default' ? styles.default : styles.urgent;
-
-    if (html !== undefined) {
-      return (
-        <li
-          className={css(itemStyle)}
-          data-notification-type={type}
-          dangerouslySetInnerHTML={html}
-          onClick={() => markAsRead(id)}
-        ></li>
-      );
-    } else {
-      return (
-        <li
-          className={css(itemStyle)}
-          data-notification-type={type}
-          onClick={() => markAsRead(id)}
-        >{value}</li>
-      );
+    static defaultProps = {
+        markAsRead: () => {},
+        type: "default",
+        html: "",
+        value: "",
+        id: 1
     }
-  }
-}
 
-export default NotificationItem;
+    render() {
+        const { markAsRead, type, html, value, id } = this.props
+        const innerHtml = { __html: getLatestNotification() }
+        if (type === "default")
+            return (
+                <li onClick={() => markAsRead(id)}
+                    data-notification-type={type}
+                    className="text-[color:var(--default-notification-item)] pl-1 max-[912px]:text-[20px] max-[912px]:w-full max-[912px]:border-b max-[912px]:border-black max-[912px]:p-[10px_8px]">
+                    {value}
+                </li>
+            )
+        else if (type === "urgent" && html) {
+            return (
+                <li
+                    onClick={() => markAsRead(id)}
+                    data-notification-type={type}
+                    dangerouslySetInnerHTML={innerHtml}
+                    className="text-[color:var(--urgent-notification-item)] pl-1 max-[912px]:text-[20px] max-[912px]:w-full max-[912px]:border-b max-[912px]:border-black max-[912px]:p-[10px_8px]">
+                </li>
+            )
+        }
+        else if (type === "urgent") {
+            return (
+                <li
+                    onClick={() => markAsRead(id)}
+                    data-notification-type={type}
+                    className="text-[color:var(--urgent-notification-item)] pl-1 max-[912px]:text-[20px] max-[912px]:w-full max-[912px]:border-b max-[912px]:border-black max-[912px]:p-[10px_8px]"
+                >
+                    {value}
+                </li>
+            )
+        }
+    }
+}
+export default NotificationItem

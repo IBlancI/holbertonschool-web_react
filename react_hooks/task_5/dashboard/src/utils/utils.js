@@ -1,5 +1,12 @@
 export const getCurrentYear = () => new Date().getFullYear();
 
-export const getFooterCopy = (isIndex) => isIndex ? 'Holberton School' : 'Holberton School main dashboard';
+export const getFooterCopy = (isIndex) =>
+  isIndex ? 'Holberton School' : 'Holberton School main dashboard';
 
-export const getLatestNotification = () => '<strong>Urgent requirement</strong> - complete by EOD'
+export const getLatestNotification = () =>
+  '<strong>Urgent requirement</strong> - complete by EOD';
+
+export function logNotificationRead(id) {
+  const log = console['log'].bind(console);
+  log(`Notification ${id} has been marked as read`);
+}

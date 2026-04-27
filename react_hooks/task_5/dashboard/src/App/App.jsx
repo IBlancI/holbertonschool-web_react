@@ -11,10 +11,10 @@ import BodySectionWithMarginBottom from '../BodySection/BodySectionWithMarginBot
 import BodySection from '../BodySection/BodySection';
 import newContext from '../Context/context';
 
-const BASE_URL = 'http://localhost:5173';
-const API_ENDPOINTS = {
-  courses: `${BASE_URL}/courses.json`,
-  notifications: `${BASE_URL}/notifications.json`,
+const API_BASE_URL = 'http://localhost:5173';
+const ENDPOINTS = {
+  courses: `${API_BASE_URL}/courses.json`,
+  notifications: `${API_BASE_URL}/notifications.json`,
 };
 
 const styles = StyleSheet.create({
@@ -25,18 +25,14 @@ const styles = StyleSheet.create({
 
 export default function App() {
   const [displayDrawer, setDisplayDrawer] = useState(true);
-  const [user, setUser] = useState({
-    email: '',
-    password: '',
-    isLoggedIn: false
-  });
+  const [user, setUser] = useState({ ...newContext.user });
   const [notifications, setNotifications] = useState([]);
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get(API_ENDPOINTS.notifications);
+        const response = await axios.get(ENDPOINTS.notifications);
         const latestNotif = {
           id: 3,
           type: "urgent",
@@ -67,7 +63,7 @@ export default function App() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(API_ENDPOINTS.courses);
+        const response = await axios.get(ENDPOINTS.courses);
         setCourses(response.data.courses);
       } catch (error) {
         console.error('Error fetching courses:', error);

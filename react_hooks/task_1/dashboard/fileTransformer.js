@@ -1,9 +1,6 @@
-import path from 'path';
-
-export default {
-	process(sourceText, sourcePath) {
-		return {
-			code: `module.exports = ${JSON.stringify(path.basename(sourcePath))};`,
-		};
-	},
+// CommonJS transformer pour Jest (fichiers statiques)
+module.exports = {
+  process() {
+    return { code: 'module.exports = "test-file-stub";' };
+  }
 };

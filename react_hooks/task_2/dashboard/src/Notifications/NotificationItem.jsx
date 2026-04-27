@@ -1,57 +1,46 @@
-import { memo } from 'react';
-import { StyleSheet, css } from 'aphrodite';
+import { memo } from 'react'
+import { getLatestNotification } from '../utils/utils'
 
-const styles = StyleSheet.create({
-  default: {
-    color: "blue",
-    "@media (max-width: 900px)": {
-      width: "100%",
-      borderBottom: "1px solid black",
-      fontSize: "20px",
-      padding: "10px 8px",
-      listStyle: "none",
-    },
-  },
-  urgent: {
-    color: "red",
-    "@media (max-width: 900px)": {
-      width: "100%",
-      borderBottom: "1px solid black",
-      fontSize: "20px",
-      padding: "10px 8px",
-      listStyle: "none",
-    },
-  },
-});
+const NotificationItem = memo(function NotificationItem(props) {
+    const { markAsRead, type, html, value, id } = props
+    const innerHtml = { __html: getLatestNotification() }
+    if (type === "default")
+        return (
+            <li onClick={() => markAsRead(id)}
+                data-notification-type={type}
+                className="text-[color:var(--default-notification-item)] pl-1 max-[912px]:text-[20px] max-[912px]:w-full max-[912px]:border-b max-[912px]:border-black max-[912px]:p-[10px_8px]">
+                {value}
+            </li>
+        )
+    else if (type === "urgent" && html) {
+        return (
+            <li
+                onClick={() => markAsRead(id)}
+                data-notification-type={type}
+                dangerouslySetInnerHTML={innerHtml}
+                className="text-[color:var(--urgent-notification-item)] pl-1 max-[912px]:text-[20px] max-[912px]:w-full max-[912px]:border-b max-[912px]:border-black max-[912px]:p-[10px_8px]">
+            </li>
+        )
+    }
+    else if (type === "urgent") {
+        return (
+            <li
+                onClick={() => markAsRead(id)}
+                data-notification-type={type}
+                className="text-[color:var(--urgent-notification-item)] pl-1 max-[912px]:text-[20px] max-[912px]:w-full max-[912px]:border-b max-[912px]:border-black max-[912px]:p-[10px_8px]"
+            >
+                {value}
+            </li>
+        )
+    }
+})
 
-const NotificationItem = memo(function NotificationItem({
-  type,
-  html,
-  value,
-  markAsRead,
-  id,
-}) {
-  const styleType = type === "default" ? styles.default : styles.urgent;
-  if (html !== undefined) {
-    return (
-      <li
-        className={css(styleType)}
-        data-notification-type={type}
-        dangerouslySetInnerHTML={html}
-        onClick={() => markAsRead(id)}
-      ></li>
-    );
-  } else {
-    return (
-      <li
-        className={css(styleType)}
-        data-notification-type={type}
-        onClick={() => markAsRead(id)}
-      >
-        {value}
-      </li>
-    );
-  }
-});
+NotificationItem.defaultProps = {
+  markAsRead: () => {},
+  type: "default",
+  html: "",
+  value: "",
+  id: 1
+}
 
-export default NotificationItem;
+export default NotificationItem

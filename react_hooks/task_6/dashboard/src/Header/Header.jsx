@@ -1,41 +1,37 @@
-import logo from "../assets/holberton-logo.jpg";
-import { StyleSheet, css } from "aphrodite";
+import holbertonLogo from '../assets/holberton-logo.jpg'
 
-const styles = StyleSheet.create({
-  header: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  logo: {
-    height: "30vmin",
-    pointerEvents: "none",
-  },
-  h1: {
-    color: "#e1003c",
-    fontFamily: "Roboto, sans-serif",
-    fontWeight: "bold",
-    fontSize: "2.5rem",
-    margin: 0,
-  },
-  a: {
-    fontFamily: "Roboto, sans-serif",
-    fontSize: "1.2rem",
-    marginLeft: "auto",
-    cursor: "pointer",
-  },
-});
-
-export default function Header({ user, logOut }) {
+function Header({ user = { email: '', password: '', isLoggedIn: false }, logOut = () => {} }) {
   return (
-    <div className={css(styles.header)}>
-      <img src={logo} className={css(styles.logo)} alt="holberton logo" />
-      <h1 className={css(styles.h1)}>School Dashboard</h1>
-      {user.isLoggedIn ? (
-        <div id="logoutSection" className={css(styles.logoutSection)}>
-          Welcome <b>{user.email}</b> <a className={css(styles.a)} href="#" onClick={logOut}>(logout)</a>
+    <>
+      <div className="App-header flex items-center py-2 max-[520px]:flex-col">
+        <img
+          className="App-logo h-60 pointer-events-none max-[520px]:h-60"
+          src={holbertonLogo}
+          alt="holberton logo"
+        />
+        <h1 className="font-bold text-[color:var(--main-color)] text-5xl max-[520px]:text-5xl max-[520px]:mt-2 max-[435px]:text-4xl">
+          School dashboard
+        </h1>
+      </div>
+
+      {user.isLoggedIn && (
+        <div id="logoutSection" className="mt-2 text-right pr-4">
+          Welcome {user.email}{' '}
+          (
+          <a
+            href="#"
+            onClick={(event) => {
+              event.preventDefault()
+              logOut()
+            }}
+          >
+            logout
+          </a>
+          )
         </div>
-      ) : null}
-    </div>
-  );
+      )}
+    </>
+  )
 }
+
+export default Header

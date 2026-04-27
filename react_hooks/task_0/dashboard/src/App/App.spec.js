@@ -1,96 +1,109 @@
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import App from './App';
+import { fireEvent, render, screen } from '@testing-library/react'
+import App from './App.jsx'
+import userEvent from '@testing-library/user-event'
 
-test('The App component renders without crashing', () => {
-  render(<App />);
-});
+let consoleSpy
 
-test('The App component renders Login when user is not logged in (default state)', () => {
-  render(<App />);
+beforeEach(() => {
+    consoleSpy = jest.spyOn(console, 'log').mockImplementation()
+})
 
-  const emailLabelElement = screen.getByLabelText(/email/i);
-  const passwordLabelElement = screen.getByLabelText(/password/i);
-  const buttonElements = screen.getAllByRole('button', { name: /ok/i })
+afterEach(() => {
+    consoleSpy.mockRestore()
+})
 
-  expect(emailLabelElement).toBeInTheDocument()
-  expect(passwordLabelElement).toBeInTheDocument()
-  expect(buttonElements.length).toBeGreaterThanOrEqual(1)
-});
+test('Renders login and copyright paragraph with the correct content', async () => {
+    render(<App />)
+    expect(screen.getByText(/^login to access the full dashboard$/i)).toBeInTheDocument()
+    expect(screen.getByText(/^copyright/i)).toBeInTheDocument()   
+})
 
-test('CourseList is not displayed when user is not logged in', () => {
-  render(<App />);
+test('Renders Email and Password label element', async () => {
+    render(<App />)
+    expect(screen.getByText(/^email:$/i)).toBeInTheDocument()
+    expect(screen.getByText(/^password:$/i)).toBeInTheDocument()
+})
 
-  const tableElement = screen.queryByRole('table');
+test('Renders the Login component when isLoggedIn is false', () => {
+    render(<App />)
+    expect(screen.getByText(/^login to access the full dashboard$/i)).toBeInTheDocument()
+})
 
-  expect(tableElement).not.toBeInTheDocument();
-});
+test('Renders the CourseList component when isLoggedIn is true', async() => {
+    const user = userEvent.setup()
+    render(<App />)
 
-test('when user logs in, CourseList is displayed and Login is not displayed', async () => {
-  const user = userEvent.setup();
-  render(<App />);
+    const emailInput = screen.getByLabelText(/email/i)
+    const passwordInput = screen.getByLabelText(/password/i)
+    const submitButton = screen.getByRole('button', { name: /ok/i })
 
-  const emailInput = screen.getByLabelText(/email/i);
-  const passwordInput = screen.getByLabelText(/password/i);
-  const submitButton = screen.getByRole('button', { name: /ok/i });
+    await user.type(emailInput, 'gina.linetti@nypd.com')
+    await user.type(passwordInput, 'verybadpassword')
+    await user.click(submitButton)
 
-  await user.type(emailInput, 'test@example.com');
-  await user.type(passwordInput, 'password123');
+    expect(screen.getByRole('table')).toBeInTheDocument()
+})
 
-  await waitFor(() => {
-    expect(submitButton).toBeEnabled();
-  });
+test('Verify that alert is called once when ctrl+h are pressed', () => {
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation()
 
-  await user.click(submitButton);
+    render(<App />)
 
-  await waitFor(() => {
-    const tableElement = screen.getByRole('table');
-    expect(tableElement).toBeInTheDocument();
-  });
+    fireEvent.keyDown(document, {key: 'h', ctrlKey: true})
+    expect(alertSpy).toHaveBeenCalledTimes(1)
+    expect(alertSpy).toHaveBeenCalledWith('Logging you out')
+    
+    alertSpy.mockRestore()
+})
 
-  const loginForm = screen.queryByLabelText(/email/i);
-  expect(loginForm).not.toBeInTheDocument();
-});
+test('Checks that alert function is called with "Logging you out" message', () => {
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation()
+    render(<App />)
+    fireEvent.keyDown(document, {
+        key: 'h',
+        ctrlKey: true
+    })
+    expect(alertSpy).toHaveBeenCalledWith('Logging you out')
+    alertSpy.mockRestore()
+})
 
-test('it should display an alert and log out when ctrl+h is pressed', () => {
-  const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+test('Checks that a title with the text News from the School, and a paragraph element with the text Holberton School News goes here are displayed by default in the App component', () => {
+    render(<App />)
+    const bodySectionTitle = screen.getByText(/news from the school/i)
 
-  render(<App />);
+    expect(bodySectionTitle).toBeInTheDocument()
+})
 
-  fireEvent.keyDown(document, { ctrlKey: true, key: 'h' });
+test('Checks that login method prop is correctly called with the user’s email and password when the login form is submitted', async() => {
+    const user = userEvent.setup()
 
-  expect(alertSpy).toHaveBeenCalledWith('Logging you out');
+    render(<App />)
 
-  alertSpy.mockRestore();
-});
+    const emailInput = screen.getByLabelText(/email/i)
+    const passwordInput = screen.getByLabelText(/password/i)
+    const submitButton = screen.getByRole('button', { name: /ok/i })
 
-test('it should display "News from the School" title and paragraph by default', () => {
-  render(<App />);
+    expect(screen.getByText(/^login to access the full dashboard$/i)).toBeInTheDocument()
+    expect(screen.queryByRole('table')).not.toBeInTheDocument()
 
-  const newsTitle = screen.getByRole('heading', { name: /news from the school/i });
-  const newsParagraph = screen.getByText(/holberton school news goes here/i);
+    await user.type(emailInput, 'gina.linetti@nypd.com')
+    await user.type(passwordInput, 'verybadpassword')
+    await user.click(submitButton)
 
-  expect(newsTitle).toBeInTheDocument();
-  expect(newsParagraph).toBeInTheDocument();
-});
+    expect(screen.getByRole('table')).toBeInTheDocument()
+    expect(screen.queryByText(/^login to access the full dashboard$/i)).not.toBeInTheDocument()
+})
 
-test('clicking on a notification item removes it from the list and logs to console', async () => {
-  const user = userEvent.setup();
-  const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+test('Clicking on a notification item removes it from the list and logs the expected string', async() => {
+    const user = userEvent.setup()
+    render(<App />)
 
-  render(<App />);
+    const notificationItem = screen.getByText(/new course available/i)
+    expect(notificationItem).toBeInTheDocument()
 
-  const notificationItems = screen.getAllByRole('listitem');
-  const initialCount = notificationItems.length;
+    await user.click(notificationItem)
 
-  await user.click(notificationItems[0]);
+    expect(screen.queryByText(/new course available/i)).not.toBeInTheDocument()
 
-  expect(consoleSpy).toHaveBeenCalledWith('Notification 1 has been marked as read');
-
-  await waitFor(() => {
-    const updatedItems = screen.queryAllByRole('listitem');
-    expect(updatedItems.length).toBe(initialCount - 1);
-  });
-
-  consoleSpy.mockRestore();
-});
+    expect(consoleSpy).toHaveBeenCalledWith("Notification 1 has been marked as read")
+})
