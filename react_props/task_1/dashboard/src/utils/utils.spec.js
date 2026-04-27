@@ -1,7 +1,7 @@
 import { getCurrentYear, getFooterCopy, getLatestNotification } from "./utils";
 
 test('Returns the correct year', () => {
-  expect(getCurrentYear()).toBe(2025);
+  expect(getCurrentYear()).toBe(new Date().getFullYear());
 });
 
 test('Returns the correct string when the argument is true or false', () => {
