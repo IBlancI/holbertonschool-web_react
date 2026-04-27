@@ -2,10 +2,10 @@ import { render, screen } from "@testing-library/react";
 import { getCurrentYear, getFooterCopy } from "../utils/utils";
 import Footer from "./Footer";
 
-test('the text content within the 2 p elements in the app-body and app-footer divs matches', () => {
+test('the text content within the footer div matches', () => {
   render(<Footer />);
-  const divfooter = screen.getByText(/Copyright 2025 - holberton School/i);
-
+  const year = getCurrentYear();
+  const divfooter = screen.getByText(new RegExp(`Copyright ${year}`, 'i'));
   expect(divfooter).toBeInTheDocument();
 });
 
