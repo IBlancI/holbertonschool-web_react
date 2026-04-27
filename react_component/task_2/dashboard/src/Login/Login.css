@@ -1,0 +1,9 @@
+.App-body {
+  padding: 10px;
+}
+.App-body label {
+  margin: 0 8px 0 16px;
+}
+.App-body input {
+  margin-right: 8px;
+}

@@ -1,0 +1,8 @@
+header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+
+#logo {
+  width: 200px;
+  height: 200px;
+  background: url("../../assets/holberton-logo.jpg") no-repeat;
+  background-size: 200px 200px;
+}

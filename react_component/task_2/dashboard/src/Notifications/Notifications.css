@@ -1,0 +1,74 @@
+/* ===== Titre toujours visible (drawer fermé) ===== */
+.notification-title {
+  position: fixed;
+  top: 8px;
+  right: 12px;
+  font-weight: 500;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  color: #111;
+  z-index: 1000;
+}
+
+/* ===== Tiroir (drawer ouvert) ===== */
+.notifications {
+  position: fixed;              /* colle le panneau en haut-droite */
+  top: 36px;                    /* sous le titre */
+  right: 12px;
+  width: 360px;
+  max-width: calc(100% - 24px);
+  border: 2px dashed #e0354b;
+  background: #fff;
+  padding: 16px 16px 12px;
+  margin: 0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  z-index: 999;
+}
+
+/* Contenu */
+.notification-items > p {
+  margin: 0 0 12px;
+}
+
+.notifications-empty {
+  margin: 0;
+  color: #222;
+}
+
+/* ===== Liste AVEC puces ===== */
+.notifications ul {
+  list-style: disc;             /* remet les puces */
+  list-style-position: outside;
+  padding-left: 18px;           /* espace pour les puces */
+  margin: 0;
+}
+
+/* Couleurs des items + des puces */
+.notifications li[data-notification-type="default"],
+.notifications li[data-notification-type="default"]::marker {
+  color: #1d4ed8;               /* bleu */
+}
+
+.notifications li[data-notification-type="urgent"],
+.notifications li[data-notification-type="urgent"]::marker {
+  color: #e11d48;               /* rouge */
+}
+
+/* ===== Bouton de fermeture ===== */
+.notifications-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.notifications-close img {
+  width: 12px;
+  height: 12px;
+  display: block;
+}

@@ -1,0 +1,7 @@
+/* bloc principal */
+.bodySection {}
+
+/* marge bas demandée pour le conteneur spécialisé */
+.bodySectionWithMargin {
+  margin-bottom: 40px;
+}

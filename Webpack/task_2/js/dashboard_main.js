@@ -12,6 +12,6 @@ $("body").append($btn, $counter);
 
 let count = 0;
 $btn.on("click", () => {
-    count += 1;
-    $("#count").text(count);
+  count += 1;
+  $("#count").text(count);
 });

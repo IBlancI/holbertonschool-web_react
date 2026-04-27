@@ -1,0 +1,34 @@
+.notifications {
+  border: 2px dashed red;
+  padding: 10px;
+  margin: 10px;
+  position: relative;
+}
+
+/* Style du paragraphe */
+.notifications p {
+  margin: 0 0 10px 0;
+}
+
+/* Liste */
+.notifications ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Style des <li> selon priorité */
+.notifications li[data-priority="default"] {
+  color: blue;
+}
+
+.notifications li[data-priority="urgent"] {
+  color: red;
+}
+
+/* Image du bouton de fermeture */
+.notifications button img {
+  width: 10px;
+  height: 10px;
+}
+

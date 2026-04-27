@@ -1,0 +1,194 @@
+/* @import "tailwindcss";
+
+@theme {
+  --font-sans: "Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+@layer base {
+  :root { font-family: var(--font-sans); }
+  html, body {
+    font-family: "Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  }
+  body { @apply font-sans; }
+} */
+
+@import "tailwindcss";
+
+/* Forcer des requêtes réseau vers les fichiers roboto .woff2 */
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("@fontsource/roboto/files/roboto-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("@fontsource/roboto/files/roboto-latin-500-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("@fontsource/roboto/files/roboto-latin-700-normal.woff2") format("woff2");
+}
+
+/* Thème Tailwind v4 : Roboto par défaut */
+@theme {
+  --font-sans: "Roboto", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+               Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji",
+               "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+  --color-table-header: #deb5b5; /* === Tâche 1 : variables couleurs du tableau === */
+  --color-table-rows: #CDCDCD;
+  --main-color: #e1003c;
+  --default-notification-item: blue;
+  --urgent-notification-item: red;
+}
+
+/* Application globale */
+@layer base {
+  html { font-family: var(--font-sans); }
+  body { @apply font-sans; }
+}
+
+/* Liste Notifications : puces carrées visibles et colorées */
+.notifications-list{
+  list-style-type: square;      /* carrés */
+  padding-left: 1.25rem;        /* ~ pl-5 */
+  margin: 0;
+}
+.notifications-list li::marker{ font-size: 0.85rem; }
+.notifications-list li[data-notification-type="default"]::marker{
+  color: var(--default-notification-item); /* blue */
+}
+.notifications-list li[data-notification-type="urgent"]::marker{
+  color: var(--urgent-notification-item);  /* red */
+}
+
+/*Body section*/
+/* bloc principal */
+.bodySection {}
+
+/* marge bas demandée pour le conteneur spécialisé */
+.bodySectionWithMargin {
+  margin-bottom: 40px;
+}
+
+/* Header */
+.App-header {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 3px solid var(--main-color);
+}
+/* Couleur du h1 via la variable */
+.App-header h1 { color: var(--main-color); }
+
+.App-logo {
+  height: 200px;
+}
+
+
+/*Footer*/
+.App-footer {
+  position: static;            /* enlever fixed */
+  left: auto; right: auto; bottom: auto;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+
+  border-top: 3px solid var(--main-color);
+  text-align: center;
+  font-style: italic;
+  padding: 10px 0;
+}
+
+
+/*Login*/
+.App-body {
+  padding: 10px;
+}
+.App-body label {
+  margin: 0 8px 0 16px;
+}
+.App-body input {
+  margin-right: 8px;
+}
+ /*app*/
+ /* :root{
+  --hb-red:#e1003c;
+  --gut:10px;
+} */
+
+/* html,body,#root{ margin:10px; }  pas de marge par défaut */
+
+/* Police par défaut de l’app (hors Notifications) */
+html, body, #root {
+  margin: 10px;
+  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+/* HEADER : bordure 100%, contenu paddé */
+.App-header {                 /* garde display, align-items, padding, border */
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 3px solid red;
+}
+
+.App-header h1 {              /* ✅ seule la couleur du h1 */
+  color: #e1003c;
+}
+
+.App-header img {
+  height: 200px;
+  margin-right: 20px;
+}
+
+.App-body {
+  padding: 40px;
+}
+
+/* Espace supplémentaire avant "Password" */
+.App-login label[for="password"] {
+  margin-left: 16px;   /* ajuste la valeur : 12, 16, 24… */
+}
+
+/* FORMULAIRE */
+.App-login{ display:inline-flex; align-items:center; gap:8px; }
+
+/* espace aux extrémités de la barre rouge du footer */
+.App-footer {
+  position: fixed;
+  left: 20px;        /* espace à gauche */
+  right: 20px;       /* espace à droite */
+  bottom: 0;         /* mets 10px si tu veux aussi un espace en bas */
+  /* bottom: 10px; */
+
+  border-top: 3px solid red;
+  text-align: center;
+  font-style: italic;
+  padding: 10px 0;
+  background-color: #fff;
+
+  width: auto;       /* surtout pas 100% */
+  margin: 0;         /* margin n'affecte pas un élément fixed correctement ici */
+}
+
+/* petit titre au-dessus du Login */
+.App-body-title {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* centre le message "No course available yet" */
+.CourseList-empty {
+  text-align: center;
+  color: #555;
+}
+

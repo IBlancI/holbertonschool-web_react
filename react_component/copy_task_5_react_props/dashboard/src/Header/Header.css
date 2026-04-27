@@ -1,0 +1,10 @@
+.App-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 3px solid #e0354b;
+  padding: 20px 0;
+}
+.App-logo {
+  height: 200px;
+}

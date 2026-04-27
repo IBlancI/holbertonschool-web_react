@@ -1,0 +1,19 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# tests / Playwright
+playwright-report/
+test-results/
+.playwright/
+e2e-tests/
+
+# misc
+coverage/
+*.log
+.env
+.env.*
+.DS_Store
+EOF
