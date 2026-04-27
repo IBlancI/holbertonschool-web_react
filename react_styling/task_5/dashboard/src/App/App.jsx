@@ -43,12 +43,12 @@ export default class App extends Component {
   }
 
   render() {
-    const { isLoggedIn = false, logOut = () => {} } = this.props;
+    const { isLoggedIn = true, logOut = () => {} } = this.props;
 
     return (
       <div className="relative px-3 min-h-screen flex flex-col">
         <div className="absolute top-0 right-0 z-10">
-          <Notifications notifications={[]} />
+          <Notifications notifications={notificationsList} />
         </div>
         <div className="flex-1">
           <Header />
@@ -65,7 +65,7 @@ export default class App extends Component {
           }
           <BodySection title="News from the School">
             <p>
-              Holberton School news goes here
+              ipsum Lorem ipsum dolor sit amet consectetur, adipisicing elit. Similique, asperiores architecto blanditiis fuga doloribus sit illum aliquid ea distinctio minus accusantium, impedit quo voluptatibus ut magni dicta. Recusandae, quia dicta?
             </p>
           </BodySection>
         </div>

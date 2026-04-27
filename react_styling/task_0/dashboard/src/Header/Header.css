@@ -1,18 +1,18 @@
 .App-header {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  gap: 16px;
+  border-bottom: 3px solid #e0354b;
+  padding: 24px 0 12px;
+}
+
+.App-header img {
+  height: 180px;
 }
 
 .App-header h1 {
-  color: #e1003c;
-  font-family: 'Roboto', sans-serif;
-  font-weight: bold;
-  font-size: 2.5rem;
+  color: #e0354b;
+  font-weight: 700;
+  font-size: 48px;
   margin: 0;
-}
-
-.App-logo {
-  height: 30vmin;
-  pointer-events: none;
 }

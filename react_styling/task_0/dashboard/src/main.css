@@ -1,11 +1,32 @@
 @import "tailwindcss";
 
 @theme {
-  --font-roboto: "Roboto", system-ui, sans-serif;
+  --font-sans: "Roboto", sans-serif;
 }
 
 @layer base {
-  html {
-    font-family: var(--font-roboto);
+  html,
+  body {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+  }
+
+  label,
+  button,
+  .notification-title {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
   }
 }

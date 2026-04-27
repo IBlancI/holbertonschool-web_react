@@ -1,72 +1,48 @@
-import { render, fireEvent, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen, fireEvent } from "@testing-library/react";
+import App from "./App";
 
-test('The App component renders without crashing', () => {
+test('App component', () => {
   render(<App />);
 });
 
-test('The App component renders CourseList when isLoggedIn is true', () => {
-  const props = {
-    isLoggedIn: true
-  }
-
-  render(<App {...props} />);
-
-  const tableElement = screen.getByRole('table');
-
-  expect(tableElement).toBeInTheDocument()
-});
-
-test('The App component renders Login when isLoggedIn is false', () => {
-  const props = {
-    isLoggedIn: false
-  }
-
-  render(<App {...props} />);
-
-  const inputElements = screen.getAllByLabelText(/email|password/i);
-  const emailLabelElement = screen.getByLabelText(/email/i);
-  const passwordLabelElement = screen.getByLabelText(/password/i);
-  const buttonElementText = screen.getByRole('button', { name: /ok/i })
-
-  expect(inputElements).toHaveLength(2)
-  expect(emailLabelElement).toBeInTheDocument()
-  expect(passwordLabelElement).toBeInTheDocument()
-  expect(buttonElementText).toBeInTheDocument()
-});
-
-test('it should call the logOut prop once whenever the user hits "Ctrl" + "h" keyboard keys', () => {
+test('should call logOut function when ctrl+h is pressed', () => {
+  // Create a mock function for logOut prop
   const logOutMock = jest.fn();
+  // Spy alert and mock alert popup
   const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
 
-  render(<App isLoggedIn={true} logOut={logOutMock} />);
+  // Render the component with the mock logOut function
+  render(<App logOut={logOutMock} />);
 
-  fireEvent.keyDown(document, { ctrlKey: true, key: 'h' });
-
-  expect(logOutMock).toHaveBeenCalledTimes(1);
-
-  alertSpy.mockRestore();
-});
-
-test('it should display an alert window whenever the user hit "ctrl" + "h" keyboard keys', () => {
-  const logoutSpy = jest.fn();
-  const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
-
-  render(<App logOut={logoutSpy} />);
-
-  fireEvent.keyDown(document, { ctrlKey: true, key: 'h' });
+  // Simulate the keydown event (Ctrl+h)
+  fireEvent.keyDown(document, { key: 'h', ctrlKey: true });
 
   expect(alertSpy).toHaveBeenCalledWith('Logging you out');
+  expect(logOutMock).toHaveBeenCalledTimes(1);
 
+  // Restore alert after test
   alertSpy.mockRestore();
 });
 
-test('it should display "News from the School" title and paragraph by default', () => {
+test('Check that a title of Course list is displayed above the CourseList component when the isLoggedIn prop is set to true.', () => {
+  render(<App isLoggedIn={true} />);
+
+  const heading = screen.getByRole('heading', { level: 2, name: /Course list/i});
+   expect(heading).toBeInTheDocument();
+});
+
+test('displays "Log in to continue" title when isLoggedIn is false', () => {
+  render(<App isLoggedIn={false} />);
+  const text = screen.getByText(/Log in to continue/i);
+  expect(text).toBeInTheDocument();
+});
+
+test('Check that a title "News from the School" and paragraph are displayed by default', () => {
   render(<App />);
 
-  const newsTitle = screen.getByRole('heading', { name: /news from the school/i });
-  const newsParagraph = screen.getByText(/holberton school news goes here/i);
+  const heading = screen.getByRole('heading', { level: 2, name: /News from the School/i });
+  const paragraph = screen.getByText(/Holberton School News goes here/i);
 
-  expect(newsTitle).toBeInTheDocument();
-  expect(newsParagraph).toBeInTheDocument();
+  expect(heading).toBeInTheDocument();
+  expect(paragraph).toBeInTheDocument();
 });

@@ -1,38 +1,21 @@
 .App-body {
-  display: flex;
-  flex-direction: column;
-  height: 54vh;
-  padding: 20px 20px 20px 40px;
-  border-top: 5px red solid;
-  margin-top: 5px
+  padding: 24px;
+  min-height: 180px;
 }
 
-.App-body p {
-  font-family: 'Roboto', sans-serif;
-  font-size: 1.3rem;
-  margin-top: 30px;
+.login-form {
+  display: grid;
+  grid-template-columns: auto 220px auto 220px auto;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 6px;
 }
 
-.App-body .form {
-  font-size: 1.2rem;
-  font-family: 'Roboto', sans-serif;
-  margin-top: 25px;
+.login-form label {
+  justify-self: end;
 }
 
-input, button {
-  border: 1px solid black;
-  border-radius: 4px;
-}
-
-.App-body .form label{
-  padding-right: 10px;
-}
-
-#email, #password {
-  margin-right: 10px
-}
-
-.form button {
-  cursor: pointer;
-  padding: 0 3px;
+.login-form button {
+  margin-left: 8px;
+  padding: 2px 8px;
 }

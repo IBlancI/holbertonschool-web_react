@@ -1,35 +1,38 @@
-import React, { PureComponent } from 'react';
+import React from 'react'
+import PropTypes from 'prop-types'
 
-export default class NotificationItem extends PureComponent {
+class NotificationItem extends React.PureComponent {
   render() {
-    const { type, html, value, markAsRead, id } = this.props;
-    // console.log(`Rendering NotificationItem with id: ${id}, type: ${type}, value: ${value}`);
-    
-    if (type === 'default') {
-      return (
-        <li 
-          className="text-[color:var(--default-notification-item)] pl-1"
-          data-notification-type={type}
-          onClick={() => markAsRead(id)}
-        >{value}</li>
-      );
-    } else if (type === 'urgent' && html !== undefined) {
-      return (
-        <li 
-          className="text-[color:var(--urgent-notification-item)] pl-1"
-          data-notification-type={type} 
-          dangerouslySetInnerHTML={html}
-          onClick={() => markAsRead(id)}
-        ></li>
-      );
-    } else {
-      return (
-        <li 
-          className="text-[color:var(--urgent-notification-item)] pl-1"
-          data-notification-type={type}
-          onClick={() => markAsRead(id)}
-        >{value}</li>
-      );
-    }
+    const { type, html, value, markAsRead } = this.props
+    const textColor =
+      type === 'urgent'
+        ? 'text-[var(--urgent-notification-item)]'
+        : 'text-[var(--default-notification-item)]'
+
+    return (
+      <li
+        data-notification-type={type}
+        className={textColor}
+        onClick={markAsRead}
+      >
+        {value ? value : <span dangerouslySetInnerHTML={html} />}
+      </li>
+    )
   }
 }
+
+NotificationItem.propTypes = {
+  type: PropTypes.string,
+  value: PropTypes.string,
+  html: PropTypes.shape({
+    __html: PropTypes.string,
+  }),
+  markAsRead: PropTypes.func,
+}
+
+NotificationItem.defaultProps = {
+  type: 'default',
+  markAsRead: () => {},
+}
+
+export default NotificationItem

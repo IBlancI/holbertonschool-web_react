@@ -17,4 +17,3 @@ function Login() {
 
 const LoginWithLogging = WithLogging(Login)
 export default LoginWithLogging;
-
