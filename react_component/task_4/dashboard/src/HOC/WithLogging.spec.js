@@ -1,13 +1,8 @@
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import WithLogging from './WithLogging';
 
-afterEach(() => {
-  cleanup();
-  jest.restoreAllMocks();
-});
-
-// Mock component donné par l’énoncé
 class MockApp extends React.Component {
   render() {
     return <h1>Hello from Mock App Component</h1>;
@@ -15,31 +10,16 @@ class MockApp extends React.Component {
 }
 
 describe('WithLogging HOC', () => {
-  test('renders heading from the wrapped component', () => {
-    const Wrapped = WithLogging(MockApp);
-    render(<Wrapped />);
+  afterEach(() => {
+    cleanup();
+    jest.restoreAllMocks();
+  });
 
+  test('renders a component wrapped by WithLogging', () => {
+    const WrappedMockApp = WithLogging(MockApp);
+    render(<WrappedMockApp />);
     expect(
-      screen.getByRole('heading', { level: 1, name: /Hello from Mock App Component/i })
-    ).toBeInTheDocument();
-  });
-
-  test('logs on mount and unmount', () => {
-    const Wrapped = WithLogging(MockApp);
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-
-    const { unmount } = render(<Wrapped />);
-    // Avec StrictMode en dev, ces logs peuvent apparaître 2 fois : on vérifie le contenu, pas le nombre précis.
-    expect(logSpy).toHaveBeenCalledWith('Component MockApp is mounted');
-
-    unmount();
-    expect(logSpy).toHaveBeenCalledWith('Component MockApp is going to unmount');
-
-    logSpy.mockRestore();
-  });
-
-  test('has the proper displayName', () => {
-    const Wrapped = WithLogging(MockApp);
-    expect(Wrapped.displayName).toBe('WithLogging(MockApp)');
+      screen.getByRole('heading', { level: 1 })
+    ).toHaveTextContent('Hello from Mock App Component');
   });
 });

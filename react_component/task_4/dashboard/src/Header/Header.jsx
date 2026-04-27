@@ -1,17 +1,12 @@
 import React from 'react';
 import './Header.css';
-import holbertonLogo from '../assets/holberton-logo.jpg'; // ou .jpg
+import logo from '../assets/holberton-logo.jpg';
 
 export default function Header() {
   return (
-    <header className="App-header">
-      <img
-        className="App-logo"
-        // src="https://www.holbertonschool.com/holberton-logo.png"
-        src={holbertonLogo}
-        alt="Holberton logo"
-      />
+    <div className="App-header">
+      <img src={logo} alt="holberton logo" />
       <h1>School dashboard</h1>
-    </header>
+    </div>
   );
 }

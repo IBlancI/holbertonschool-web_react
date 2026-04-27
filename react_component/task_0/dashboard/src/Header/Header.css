@@ -3,8 +3,16 @@
   align-items: center;
   gap: 16px;
   border-bottom: 3px solid #e0354b;
-  padding: 20px 0;
+  padding: 24px 0 12px;
 }
-.App-logo {
-  height: 200px;
+
+.App-header img {
+  height: 180px;
+}
+
+.App-header h1 {
+  color: #e0354b;
+  font-weight: 700;
+  font-size: 48px;
+  margin: 0;
 }

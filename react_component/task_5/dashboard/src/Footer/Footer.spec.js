@@ -1,16 +1,16 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import Footer from './Footer';
+import Footer from './Footer.jsx';
 
 describe('Footer', () => {
-  test('renders copyright with current year', () => {
-    render(<Footer />);
-    const year = new Date().getFullYear().toString();
+  test('renders without crashing', () => {
+    render(<Footer isIndex />);
+  });
 
-    const p = screen.getByText(/copyright/i);
-    expect(p).toBeInTheDocument();
-    expect(p).toHaveTextContent(year);
-    // Don’t over-specify getFooterCopy(false); we just ensure visible text is correct
+  test('renders "Copyright {current year} - Holberton School"', () => {
+    render(<Footer isIndex />); // <- important : isIndex = true
+    const year = new Date().getFullYear();
+    const regex = new RegExp(`Copyright\\s+${year}\\s+-\\s+Holberton School`, 'i');
+    expect(screen.getByText(regex)).toBeInTheDocument();
   });
 });

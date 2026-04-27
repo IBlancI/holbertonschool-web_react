@@ -1,11 +1,3 @@
-/* :root{
-  --hb-red:#e1003c;
-  --gut:10px;
-} */
-
-/* html,body,#root{ margin:10px; }  pas de marge par défaut */
-
-/* Police par défaut de l’app (hors Notifications) */
 html, body, #root {
   margin: 10px;
   font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
@@ -45,8 +37,7 @@ html, body, #root {
   position: fixed;
   left: 20px;        /* espace à gauche */
   right: 20px;       /* espace à droite */
-  bottom: 0;         /* mets 10px si tu veux aussi un espace en bas */
-  /* bottom: 10px; */
+  bottom: 0;
 
   border-top: 3px solid red;
   text-align: center;
