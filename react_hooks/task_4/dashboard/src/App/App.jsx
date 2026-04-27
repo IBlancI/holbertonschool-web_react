@@ -23,17 +23,46 @@ const styles = StyleSheet.create({
   }
 });
 
-const notificationsList = [
-  { id: 1, type: 'default', value: 'New course available' },
-  { id: 2, type: 'urgent', value: 'New resume available' },
-  { id: 3, type: 'urgent', html: { __html: getLatestNotification() } },
-];
+
 
 export default function App() {
   const [displayDrawer, setDisplayDrawer] = useState(true);
   const [user, setUser] = useState({ ...newContext.user });
-  const [notifications, setNotifications] = useState(notificationsList);
+  const [notifications, setNotifications] = useState([]);
   const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.get(ENDPOINTS.notifications);
+        const fetchedNotifications = response.data.notifications;
+        
+        // Handle special case for getLatestNotification()
+        const latestNotif = {
+          id: 3,
+          type: "urgent",
+          html: { __html: getLatestNotification() }
+        };
+        
+        const indexToReplace = fetchedNotifications.findIndex(
+          notification => notification.id === 3
+        );
+        
+        const updatedNotifications = [...fetchedNotifications];
+        if (indexToReplace !== -1) {
+          updatedNotifications[indexToReplace] = latestNotif;
+        } else {
+          updatedNotifications.push(latestNotif);
+        }
+        
+        setNotifications(updatedNotifications);
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -45,12 +74,11 @@ export default function App() {
       }
     };
 
-    if (!user.isLoggedIn) {
+    if (user.isLoggedIn) {
+      fetchCourses();
+    } else {
       setCourses([]);
-      return;
     }
-
-    fetchCourses();
   }, [user.isLoggedIn]);
 
   const handleDisplayDrawer = useCallback(() => {

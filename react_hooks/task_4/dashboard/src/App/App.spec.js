@@ -1,10 +1,21 @@
 import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import App from './App';
 import mockAxios from 'jest-mock-axios';
+import { getLatestNotification } from '../utils/utils';
 
 afterEach(() => {
   mockAxios.reset();
 });
+
+const mockNotificationsResponse = {
+  data: {
+    notifications: [
+      { id: 1, type: 'default', value: 'New course available' },
+      { id: 2, type: 'urgent', value: 'New resume available' },
+      { id: 3, type: 'urgent', html: { __html: getLatestNotification() } }
+    ]
+  }
+};
 
 const mockCoursesResponse = {
   data: {
@@ -16,12 +27,20 @@ const mockCoursesResponse = {
   }
 };
 
-test('The App component renders without crashing', () => {
+test('The App component renders without crashing', async () => {
   render(<App />);
+
+  mockAxios.mockResponse(mockNotificationsResponse);
+
+  await waitFor(() => {
+    expect(mockAxios.get).toHaveBeenCalledWith('http://localhost:5173/notifications.json');
+  });
 });
 
 test('The App component renders Login by default (user not logged in)', async () => {
   render(<App />);
+
+  mockAxios.mockResponse(mockNotificationsResponse);
 
   await waitFor(() => {
     const emailLabelElement = screen.getByLabelText(/email/i);
@@ -37,6 +56,8 @@ test('The App component renders Login by default (user not logged in)', async ()
 test('it should display "News from the School" title and paragraph by default', async () => {
   render(<App />);
 
+  mockAxios.mockResponse(mockNotificationsResponse);
+
   await waitFor(() => {
     const newsTitle = screen.getByRole('heading', { name: /news from the school/i });
     const newsParagraph = screen.getByText(/holberton school news goes here/i);
@@ -50,6 +71,8 @@ test('clicking on a notification item removes it from the list and logs the mess
   const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
   const { container } = render(<App />);
+
+  mockAxios.mockResponse(mockNotificationsResponse);
 
   await waitFor(() => {
     const notificationItems = container.querySelectorAll('[data-notification-type]');
@@ -74,6 +97,8 @@ test('clicking on a notification item removes it from the list and logs the mess
 test('handleDisplayDrawer sets displayDrawer to true initially and can be toggled', async () => {
   render(<App />);
 
+  mockAxios.mockResponse(mockNotificationsResponse);
+
   await waitFor(() => {
     expect(screen.getByText(/here is the list of notifications/i)).toBeInTheDocument();
   });
@@ -92,6 +117,8 @@ test('handleDisplayDrawer sets displayDrawer to true initially and can be toggle
 test('handleHideDrawer sets displayDrawer to false', async () => {
   render(<App />);
 
+  mockAxios.mockResponse(mockNotificationsResponse);
+
   await waitFor(() => {
     expect(screen.getByText(/here is the list of notifications/i)).toBeInTheDocument();
   });
@@ -105,6 +132,8 @@ test('handleHideDrawer sets displayDrawer to false', async () => {
 
 test('logIn function updates user state with email, password, and isLoggedIn true', async () => {
   render(<App />);
+
+  mockAxios.mockResponse(mockNotificationsResponse);
 
   await waitFor(() => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
@@ -135,6 +164,8 @@ test('logIn function updates user state with email, password, and isLoggedIn tru
 test('logOut function resets user state to isLoggedIn false with empty email and password', async () => {
   render(<App />);
 
+  mockAxios.mockResponse(mockNotificationsResponse);
+
   await waitFor(() => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
   });
@@ -163,8 +194,23 @@ test('logOut function resets user state to isLoggedIn false with empty email and
   expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
 });
 
+test('verify notifications data is fetched when App component loads initially', async () => {
+  render(<App />);
+
+  expect(mockAxios.get).toHaveBeenCalledWith('http://localhost:5173/notifications.json');
+
+  mockAxios.mockResponse(mockNotificationsResponse);
+
+  await waitFor(() => {
+    expect(screen.getByText('New course available')).toBeInTheDocument();
+    expect(screen.getByText('New resume available')).toBeInTheDocument();
+  });
+});
+
 test('verify courses data is fetched when user state changes to logged in', async () => {
   render(<App />);
+
+  mockAxios.mockResponse(mockNotificationsResponse);
 
   await waitFor(() => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
