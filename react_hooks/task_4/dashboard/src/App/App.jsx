@@ -23,42 +23,17 @@ const styles = StyleSheet.create({
   }
 });
 
+const notificationsList = [
+  { id: 1, type: 'default', value: 'New course available' },
+  { id: 2, type: 'urgent', value: 'New resume available' },
+  { id: 3, type: 'urgent', html: { __html: getLatestNotification() } },
+];
+
 export default function App() {
   const [displayDrawer, setDisplayDrawer] = useState(true);
   const [user, setUser] = useState({ ...newContext.user });
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState(notificationsList);
   const [courses, setCourses] = useState([]);
-
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await axios.get(ENDPOINTS.notifications);
-        const latestNotif = {
-          id: 3,
-          type: "urgent",
-          html: { __html: getLatestNotification() }
-        };
-        
-        const currentNotifications = response.data.notifications;
-        const indexToReplace = currentNotifications.findIndex(
-          notification => notification.id === 3
-        );
-        
-        const updatedNotifications = [...currentNotifications];
-        if (indexToReplace !== -1) {
-          updatedNotifications[indexToReplace] = latestNotif;
-        } else {
-          updatedNotifications.push(latestNotif);
-        }
-        
-        setNotifications(updatedNotifications);
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-      }
-    };
-
-    fetchNotifications();
-  }, []);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -86,21 +61,21 @@ export default function App() {
     setDisplayDrawer(false);
   }, []);
 
-  const logIn = (email, password) => {
+  const logIn = useCallback((email, password) => {
     setUser({
       email,
       password,
       isLoggedIn: true
     });
-  };
+  }, []);
 
-  const logOut = () => {
+  const logOut = useCallback(() => {
     setUser({
       email: '',
       password: '',
       isLoggedIn: false,
     });
-  };
+  }, []);
 
   const markNotificationAsRead = useCallback((id) => {
     setNotifications(prev =>
