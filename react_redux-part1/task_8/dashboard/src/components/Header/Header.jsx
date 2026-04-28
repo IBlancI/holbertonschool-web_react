@@ -1,7 +1,8 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../features/auth/authSlice';
-import logo from '../../assets/holberton-logo.jpg';
+import logo from "../../assets/holberton-logo.jpg";
 import { StyleSheet, css } from "aphrodite";
+import { logout } from '../../features/auth/authSlice';
+import { useSelector, useDispatch } from 'react-redux';
+
 
 const styles = StyleSheet.create({
   header: {
@@ -20,22 +21,17 @@ const styles = StyleSheet.create({
     fontSize: "2.5rem",
     margin: 0,
   },
-  logoutSection: {
+  a: {
     fontFamily: "Roboto, sans-serif",
     fontSize: "1.2rem",
     marginLeft: "auto",
-  },
-  link: {
-    fontFamily: "Roboto, sans-serif",
-    fontSize: "1.2rem",
     cursor: "pointer",
   },
 });
 
 export default function Header() {
+  const { user, isLoggedIn } = useSelector(state => state.auth);
   const dispatch = useDispatch();
-  const { isLoggedIn, user } = useSelector((state) => state.auth);
-
   const handleLogout = () => {
     dispatch(logout());
   };
@@ -46,7 +42,7 @@ export default function Header() {
       <h1 className={css(styles.h1)}>School Dashboard</h1>
       {isLoggedIn ? (
         <div id="logoutSection" className={css(styles.logoutSection)}>
-          Welcome <b>{user.email}</b> <a className={css(styles.link)} href="#" onClick={handleLogout}>(logout)</a>
+          Welcome <b>{user.email}</b> <a className={css(styles.a)} href="#" onClick={handleLogout}>(logout)</a>
         </div>
       ) : null}
     </div>

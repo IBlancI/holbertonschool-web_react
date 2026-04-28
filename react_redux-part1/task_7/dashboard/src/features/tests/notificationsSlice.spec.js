@@ -1,101 +1,69 @@
-import notificationsReducer, {
+import axios from 'axios';
+import reducer, {
   fetchNotifications,
   markNotificationAsRead,
   showDrawer,
   hideDrawer,
 } from '../notifications/notificationsSlice';
-import mockAxios from 'jest-mock-axios';
+import { getLatestNotification } from '../../utils/utils';
 
-afterEach(() => {
-  mockAxios.reset();
-});
+jest.mock('axios');
 
 describe('notificationsSlice', () => {
-  const defaultState = {
+  const initialState = {
     notifications: [],
     displayDrawer: true,
   };
 
-  test('should return the initial state', () => {
-    expect(notificationsReducer(undefined, { type: 'unknown' })).toEqual(defaultState);
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  test('should handle markNotificationAsRead', () => {
-    const stateWithNotifs = {
-      ...defaultState,
+  it('should return the correct initial state by default', () => {
+    expect(reducer(undefined, { type: '' })).toEqual(initialState);
+  });
+
+  it('should fetch notifications data correctly', async () => {
+    const mockNotifications = [
+      { id: 1, type: 'default', value: 'New course available' },
+      { id: 2, type: 'urgent', value: 'New resume available' },
+      { id: 3, type: 'urgent', value: 'Old notification' },
+    ];
+
+    axios.get.mockResolvedValue({ data: mockNotifications });
+
+    const result = await fetchNotifications()(jest.fn(), jest.fn(), undefined);
+
+    const state = reducer(initialState, {
+      type: fetchNotifications.fulfilled.type,
+      payload: result.payload,
+    });
+
+    expect(state.notifications).toHaveLength(3);
+    expect(state.notifications[2].value).toBe(getLatestNotification());
+  });
+
+  it('should remove a notification correctly when markNotificationAsRead is dispatched', () => {
+    const stateWithNotifications = {
       notifications: [
-        { id: 1, message: 'Notification 1' },
-        { id: 2, message: 'Notification 2' },
+        { id: 1, type: 'default', value: 'Notification 1' },
+        { id: 2, type: 'urgent', value: 'Notification 2' },
       ],
+      displayDrawer: true,
     };
-    const action = markNotificationAsRead(1);
-    const expected = {
-      ...stateWithNotifs,
-      notifications: [{ id: 2, message: 'Notification 2' }],
-    };
-    expect(notificationsReducer(stateWithNotifs, action)).toEqual(expected);
+
+    const newState = reducer(stateWithNotifications, markNotificationAsRead(1));
+
+    expect(newState.notifications).toEqual([
+      { id: 2, type: 'urgent', value: 'Notification 2' },
+    ]);
   });
 
-  test('should handle showDrawer', () => {
-    const closedState = { ...defaultState, displayDrawer: false };
-    const result = notificationsReducer(closedState, showDrawer());
-    expect(result.displayDrawer).toBe(true);
-  });
+  it('should toggle displayDrawer correctly with showDrawer and hideDrawer', () => {
+    let state = reducer(initialState, hideDrawer());
+    expect(state.displayDrawer).toBe(false);
 
-  test('should handle hideDrawer', () => {
-    const result = notificationsReducer(defaultState, hideDrawer());
-    expect(result.displayDrawer).toBe(false);
-  });
-
-  describe('fetchNotifications async thunk', () => {
-    test('should handle fetchNotifications.fulfilled', async () => {
-      const notifications = [
-        { id: 1, type: 'default', value: 'New course available' },
-        { id: 2, type: 'urgent', value: 'New resume available' },
-        { id: 3, type: 'urgent', html: { __html: '<strong>Urgent requirement</strong>' } },
-      ];
-
-      const dispatch = jest.fn();
-      const getState = jest.fn();
-
-      const promise = fetchNotifications()(dispatch, getState, null);
-
-      mockAxios.mockResponse({
-        data: { notifications }
-      });
-
-      await promise;
-
-      expect(dispatch).toHaveBeenCalledTimes(2);
-
-      const fulfilledAction = dispatch.mock.calls[1][0];
-
-      expect(fulfilledAction).toEqual(
-        expect.objectContaining({
-          type: fetchNotifications.fulfilled.type,
-          payload: expect.any(Array),
-        })
-      );
-
-      expect(fulfilledAction.payload).toHaveLength(3);
-    });
-
-    test('should update state.notifications on fulfilled', () => {
-      const mockNotifs = [
-        { id: 1, value: 'notification 1' },
-        { id: 2, value: 'notification 2' },
-        { id: 3, type: 'urgent', html: { __html: 'test' } }
-      ];
-
-      const action = {
-        type: fetchNotifications.fulfilled.type,
-        payload: mockNotifs
-      };
-
-      const result = notificationsReducer(defaultState, action);
-
-      expect(result.notifications).toEqual(mockNotifs);
-      expect(result.notifications).toHaveLength(3);
-    });
+    state = reducer(state, showDrawer());
+    expect(state.displayDrawer).toBe(true);
   });
 });

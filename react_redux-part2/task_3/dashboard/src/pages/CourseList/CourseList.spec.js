@@ -1,107 +1,183 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import CourseList from './CourseList';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import { logout } from '../../features/auth/authSlice';
+import rootReducer from '../../app/rootReducer';
+import { act } from '@testing-library/react';
 import mockAxios from 'jest-mock-axios';
-import CourseList from './CourseList';
-import coursesSlice, { fetchCourses } from '../../features/courses/coursesSlice';
+import { fetchCourses } from '../../features/courses/coursesSlice';
 
-describe('CourseList', () => {
-  const COURSES_DATA = [
-    { id: 1, name: 'ES6', credit: 60 },
-    { id: 2, name: 'Webpack', credit: 20 },
-    { id: 3, name: 'React', credit: 40 }
-  ];
 
-  let store;
+afterEach(() => {
+  mockAxios.reset();
+});
 
-  beforeEach(() => {
-    store = configureStore({
-      reducer: {
-        courses: coursesSlice,
-      },
-    });
+// Helper function to create a fresh store with custom initial state
+const createTestStore = (preloadedState) => {
+  return configureStore({
+    reducer: rootReducer,
+    preloadedState,
   });
+};
 
-  afterEach(() => {
-    mockAxios.reset();
+const mockCoursesResponse = {
+  data: {
+    courses: [
+      { id: 1, name: 'ES6', credit: 60 },
+      { id: 2, name: 'Webpack', credit: 20 },
+      { id: 3, name: 'React', credit: 40 }
+    ]
+  }
+};
+
+// Default initial states for auth (not logged in)
+const isLoggedInState = {
+  auth: {
+    isLoggedIn: true,
+    user: {
+      email: "nickydoll@dragrace.fr",
+      password: "pichecometrue",
+    }
+  },
+  notifications: {
+    notifications: [],
+  },
+  courses: {
+    courses: [
+      { id: 1, name: 'ES6', credit: 60 },
+      { id: 2, name: 'Webpack', credit: 20 },
+      { id: 3, name: 'React', credit: 40 }
+    ]
+  }
+};
+
+
+test('Display the course list when fetchCourses is called', () => {
+  const store = createTestStore(isLoggedInState);
+
+  render(
+    <Provider store={store}>
+      <CourseList />
+    </Provider>
+  )
+
+  const rowElements = screen.getAllByRole('row');
+  const headerText = screen.getByText(/available courses/i);
+
+  expect(rowElements).toHaveLength(5);
+  expect(headerText).toBeInTheDocument();
+  expect(store.getState().courses).toEqual(mockCoursesResponse.data);
+})
+
+test('Check that the courseList array is reseted when logout is called', () => {
+  const store = createTestStore(isLoggedInState);
+
+  render(
+    <Provider store={store}>
+      <CourseList />
+    </Provider>
+  )
+
+  const rowElements = screen.getAllByRole('row');
+  const headerText = screen.getByText(/available courses/i);
+
+  expect(rowElements).toHaveLength(5);
+  expect(headerText).toBeInTheDocument();
+  expect(store.getState().courses).toEqual(mockCoursesResponse.data);
+
+  // dispatch logout action
+  act(() => {
+    store.dispatch(logout())
   });
+  expect(store.getState().courses.courses).toEqual([]);
+});
 
-  test('renders without crashing', () => {
-    render(
-      <Provider store={store}>
-        <CourseList />
-      </Provider>
-    );
-    expect(screen.getByText('No course available yet')).toBeInTheDocument();
+test('courses should have isSelected property set to false initially', async () => {
+  const initialState = {
+    auth: {
+      isLoggedIn: true,
+      user: { email: "", password: "" }
+    },
+    notifications: { notifications: [] },
+    courses: {
+      courses: []  // Start empty!
+    }
+  };
+
+  const store = createTestStore(initialState);
+
+  const mockApiResponse = {
+    data: {
+      courses: [
+        { id: 1, name: 'ES6', credit: 60 },
+        { id: 2, name: 'Webpack', credit: 20 },
+        { id: 3, name: 'React', credit: 40 }
+      ]
+    }
+  };
+
+  // Dispatch to the REAL store and mock the axios response
+  const promise = store.dispatch(fetchCourses());
+  mockAxios.mockResponse(mockApiResponse);
+
+  await promise;
+
+  // Now check the store state AFTER the reducer processed it
+  const courses = store.getState().courses.courses;
+
+  expect(courses).toHaveLength(3);
+  courses.forEach(course => {
+    expect(course).toHaveProperty('isSelected', false);
   });
+});
 
-  test('displays the list of courses', async () => {
-    const promise = store.dispatch(fetchCourses());
+test('onChangeRow dispatches selectCourse when checkbox is checked', () => {
+  const store = createTestStore(isLoggedInState);
 
-    mockAxios.mockResponse({
-      data: {
-        courses: COURSES_DATA
-      }
-    });
+  render(
+    <Provider store={store}>
+      <CourseList />
+    </Provider>
+  );
 
-    await promise;
+  const checkboxes = screen.getAllByRole('checkbox');
+  const firstCheckbox = checkboxes[0];
+  
+  // Click triggers onChangeRow which dispatches selectCourse
+  fireEvent.click(firstCheckbox);
 
-    render(
-      <Provider store={store}>
-        <CourseList />
-      </Provider>
-    );
+  // Verify the action was dispatched by checking the state changed
+  expect(store.getState().courses.courses[0].isSelected).toBe(true);
+});
 
-    await waitFor(() => {
-      expect(screen.getByText('ES6')).toBeInTheDocument();
-      expect(screen.getByText('Webpack')).toBeInTheDocument();
-      expect(screen.getByText('React')).toBeInTheDocument();
-    });
-  });
+test('onChangeRow dispatches unSelectCourse when checkbox is unchecked', () => {
+  const stateWithSelectedCourse = {
+    auth: { isLoggedIn: true, user: { email: "", password: "" } },
+    notifications: { notifications: [] },
+    courses: {
+      courses: [
+        { id: 1, name: 'ES6', credit: 60, isSelected: true },
+        { id: 2, name: 'Webpack', credit: 20, isSelected: false },
+        { id: 3, name: 'React', credit: 40, isSelected: false }
+      ]
+    }
+  };
 
-  test('select and unselect a course when the checkbox is clicked', async () => {
-    const promise = store.dispatch(fetchCourses());
+  const store = createTestStore(stateWithSelectedCourse);
 
-    mockAxios.mockResponse({
-      data: {
-        courses: COURSES_DATA
-      }
-    });
+  render(
+    <Provider store={store}>
+      <CourseList />
+    </Provider>
+  );
 
-    await promise;
+  const checkboxes = screen.getAllByRole('checkbox');
+  const firstCheckbox = checkboxes[0];
+  
+  // Click triggers onChangeRow which dispatches unSelectCourse
+  fireEvent.click(firstCheckbox);
 
-    render(
-      <Provider store={store}>
-        <CourseList />
-      </Provider>
-    );
-
-    await waitFor(() => {
-      expect(screen.getAllByRole('checkbox')).toHaveLength(COURSES_DATA.length);
-    });
-
-    const rows = screen.getAllByRole('row').filter(row => {
-      return !row.querySelector('th');
-    });
-
-    expect(rows).toHaveLength(COURSES_DATA.length);
-
-    const firstCell = within(rows[0]).getAllByRole('cell');
-
-    const checkbox = within(firstCell[0]).getByRole('checkbox');
-
-    expect(checkbox).not.toBeChecked();
-
-    fireEvent.click(checkbox);
-    await waitFor(() => {
-      expect(store.getState().courses.courses[0].isSelected).toBe(true);
-      expect(checkbox).toBeChecked();
-    });
-
-    fireEvent.click(checkbox);
-    await waitFor(() => {
-      expect(store.getState().courses.courses[0].isSelected).toBe(false);
-      expect(checkbox).not.toBeChecked();
-    });
-  });
+  // Verify the state changed back to false
+  expect(store.getState().courses.courses[0].isSelected).toBe(false);
 });

@@ -1,25 +1,48 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import Header from './Header';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import Header from './Header';
-import authReducer from '../../features/auth/authSlice';
+import rootReducer from '../../app/rootReducer';
 
-const createMockStore = (initialState) => {
+const createTestStore = (preloadedState) => {
   return configureStore({
-    reducer: {
-      auth: authReducer
-    },
-    preloadedState: initialState
+    reducer: rootReducer,
+    preloadedState,
   });
 };
 
-const renderWithRedux = (component, initialState) => {
-  const store = createMockStore(initialState);
-  return render(
-    <Provider store={store}>
-      {component}
-    </Provider>
-  );
+const notLoggedInState = {
+  auth: {
+    isLoggedIn: false,
+    user: {
+      email: "",
+      password: "",
+    }
+  },
+  notifications: {
+    notifications: [],
+    displayDrawer: true
+  },
+  courses: {
+    courses: []
+  }
+};
+
+const isLoggedInState = {
+  auth: {
+    isLoggedIn: true,
+    user: {
+      email: "nickydoll@dragrace.fr",
+      password: "pichecometrue",
+    }
+  },
+  notifications: {
+    notifications: [],
+    displayDrawer: true
+  },
+  courses: {
+    courses: []
+  }
 };
 
 export const convertHexToRGBA = (hexCode) => {
@@ -38,17 +61,12 @@ export const convertHexToRGBA = (hexCode) => {
 };
 
 test('should contain a <p/> element with specific text, <h1/>, and an <img/>', () => {
-  const initialState = {
-    auth: {
-      user: {
-        email: '',
-        password: ''
-      },
-      isLoggedIn: false
-    }
-  };
+  const store = createTestStore(notLoggedInState)
 
-  renderWithRedux(<Header />, initialState);
+  render(
+    <Provider store={store}>
+      <Header />
+    </Provider>)
 
   const headingElement = screen.getByRole('heading', {name: /school Dashboard/i});
   const imgElement = screen.getByAltText('holberton logo')
@@ -59,17 +77,12 @@ test('should contain a <p/> element with specific text, <h1/>, and an <img/>', (
 });
 
 test('logoutSection is not rendered with default context value', () => {
-  const initialState = {
-    auth: {
-      user: {
-        email: '',
-        password: ''
-      },
-      isLoggedIn: false
-    }
-  };
+  const store = createTestStore(notLoggedInState)
 
-  renderWithRedux(<Header />, initialState);
+  render(
+    <Provider store={store}>
+      <Header />
+    </Provider>)
 
   const logoutSection = screen.queryByText(/logout/i);
 
@@ -77,49 +90,27 @@ test('logoutSection is not rendered with default context value', () => {
 });
 
 test('logoutSection is rendered when user is logged in', () => {
-  const initialState = {
-    auth: {
-      user: {
-        email: 'test@test.com',
-        password: 'password123'
-      },
-      isLoggedIn: true
-    }
-  };
-
-  renderWithRedux(<Header />, initialState);
-
-  const logoutSection = screen.getByText(/logout/i);
-  expect(logoutSection).toBeInTheDocument();
-  expect(screen.getByText(/test@test.com/i)).toBeInTheDocument();
-});
-
-test('clicking logout link calls the logOut function', () => {
-  const initialState = {
-    auth: {
-      user: {
-        email: 'test@test.com',
-        password: 'password123'
-      },
-      isLoggedIn: true
-    }
-  };
-
-  const store = createMockStore(initialState);
-  const dispatchSpy = jest.spyOn(store, 'dispatch');
+  const store = createTestStore(isLoggedInState)
 
   render(
     <Provider store={store}>
       <Header />
-    </Provider>
-  );
+    </Provider>)
+  const logoutSection = screen.getByText(/logout/i);
+  expect(logoutSection).toBeInTheDocument();
+  expect(screen.getByText(/nickydoll@dragrace.fr/i)).toBeInTheDocument();
+});
+
+test('check that isLoggedIn is set to false when logout is clicked', () => {
+  const store = createTestStore(isLoggedInState)
+
+  render(
+    <Provider store={store}>
+      <Header />
+    </Provider>)
 
   const logoutLink = screen.getByText(/logout/i);
   fireEvent.click(logoutLink);
 
-  expect(dispatchSpy).toHaveBeenCalledWith(
-    expect.objectContaining({
-      type: 'auth/logout'
-    })
-  );
+  expect(store.getState().auth.isLoggedIn).toBe(false);
 });

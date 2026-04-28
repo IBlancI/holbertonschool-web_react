@@ -1,10 +1,9 @@
-import { memo, useCallback, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { markNotificationAsRead } from '../../features/notifications/notificationsSlice';
-import NotificationItem from '../NotificationItem/NotificationItem';
-import closeIcon from '../../assets/close-icon.png';
+import { memo, useRef } from "react";
 import { StyleSheet, css } from "aphrodite";
-
+import closeIcon from "../../assets/close-icon.png";
+import NotificationItem from "../NotificationItem/NotificationItem";
+import { markNotificationAsRead } from '../../features/notifications/notificationsSlice'
+import { useDispatch, useSelector } from "react-redux";
 
 const opacityKeyframes = {
   from: {
@@ -38,7 +37,6 @@ const styles = StyleSheet.create({
     marginTop: "20px",
     opacity: 0,
     visibility: "hidden",
-    transition: "opacity 0.3s ease, visibility 0.3s ease",
     "@media (max-width: 900px)": {
       position: "fixed",
       top: 0,
@@ -93,54 +91,58 @@ const styles = StyleSheet.create({
       animationIterationCount: "3, 3",
     },
   },
-  loading: {
-    fontSize: "1.2rem",
-    fontWeight: "bold",
-    color: "rgb(114, 111, 111)",
-    float: "right",
-    position: "absolute",
-    right: "20px",
-    top: "25px",
-  }
 });
 
-
-const Notifications = memo(function Notifications () {
+const Notifications = memo(function Notifications() {
+  const { notifications, loading } = useSelector(state => state.notifications);
   const dispatch = useDispatch();
-  const {loading, notifications} = useSelector((state) => state.notifications);
 
   const DrawerRef = useRef(null);
+  const isVisible = useRef(false);
 
-  const handleToggleDrawer = useCallback(() => {
-    if (DrawerRef.current) {
-      DrawerRef.current.classList.toggle(css(styles.visible));
+  const handleToggleDrawer = () => {
+    isVisible.current = !isVisible.current;
+
+    if (isVisible.current) {
+      DrawerRef.current.className = css(styles.notificationItems, styles.visible);
+    } else {
+      DrawerRef.current.className = css(styles.notificationItems);
     }
-  }, []);
-
-  const handleMarkNotificationAsRead = useCallback((id) => {
+  }
+  const handleMarkNotificationAsRead = (id) => {
     dispatch(markNotificationAsRead(id));
-  }, [dispatch]);
-
+  }
   return (
     <>
-      <div className={css(styles.menuItem)} onClick={handleToggleDrawer}>
+      <div
+        className={css(styles.menuItem)}
+        onClick={() => handleToggleDrawer()}
+      >
         Your notifications
       </div>
       {loading ? (
-        <div className={css(styles.loading)}>Loading...</div>
-        ) : (
-        <div className={css(styles.notificationItems)} ref={DrawerRef} >
-          {notifications && notifications.length > 0 ? (
+        <div>
+          Loading...
+        </div>
+      ) : (
+        <div
+          ref={DrawerRef}
+          className={css(styles.notificationItems)}>
+          {notifications.length > 0 ? (
             <>
               <p className={css(styles.p)}>Here is the list of notifications</p>
-              <button onClick={handleToggleDrawer} aria-label="Close" className={css(styles.button)}>
+              <button
+                onClick={() => handleToggleDrawer()}
+                aria-label="Close"
+                className={css(styles.button)}
+              >
                 <img src={closeIcon} alt="close icon" />
               </button>
               <ul className={css(styles.ul)}>
                 {notifications.map((notification) => (
                   <NotificationItem
-                    key={notification.id}
                     id={notification.id}
+                    key={notification.id}
                     type={notification.type}
                     value={notification.value}
                     html={notification.html}
@@ -153,8 +155,8 @@ const Notifications = memo(function Notifications () {
             <p className={css(styles.p)}>No new notifications for now</p>
           )}
         </div>
-
-        )}
+      )
+      }
     </>
   );
 });

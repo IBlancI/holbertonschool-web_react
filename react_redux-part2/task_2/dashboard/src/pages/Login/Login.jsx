@@ -1,8 +1,8 @@
-import { useDispatch } from 'react-redux';
-import WithLogging from '../../components/HOC/WithLogging';
-import useLogin from '../../hooks/useLogin';
-import { login } from '../../features/auth/authSlice';
 import { StyleSheet, css } from "aphrodite";
+import WithLogging from "../../components/HOC/WithLogging";
+import useLogin from "../../hooks/useLogin";
+import { login } from '../../features/auth/authSlice'
+import { useDispatch } from 'react-redux'
 
 const styles = StyleSheet.create({
   body: {
@@ -58,8 +58,11 @@ const styles = StyleSheet.create({
   },
 });
 
-function Login() {
-  const dispatch = useDispatch();
+const Login = () => {
+  const dispatch = useDispatch()
+  const onLogin = (email, password) => {
+    dispatch(login({ email, password }));
+  }
   const {
     email,
     password,
@@ -67,40 +70,42 @@ function Login() {
     handleChangeEmail,
     handleChangePassword,
     handleLoginSubmit
-  } = useLogin({ onLogin: (email, password) => dispatch(login({ email, password })) });
+  } = useLogin(onLogin);
 
   return (
-    <form aria-label="form" onSubmit={handleLoginSubmit}>
-      <div className={css(styles.body)}>
-        <p className={css(styles.p)}>Login to access the full dashboard</p>
-        <div className={css(styles.form)}>
-          <label htmlFor="email" className={css(styles.label)}>Email</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            className={css(styles.input)}
-            value={email}
-            onChange={handleChangeEmail}
-          />
-          <label htmlFor="password" className={css(styles.label)}>Password</label>
-          <input
-            type="password"
-            name="password"
-            id="password"
-            className={css(styles.input)}
-            value={password}
-            onChange={handleChangePassword}
-          />
-          <input
-            type="submit"
-            value="OK"
-            className={css(styles.button)}
-            disabled={!enableSubmit}
-          />
-        </div>
-      </div>
-    </form>
+    <div className={css(styles.body)}>
+      <p className={css(styles.p)}>Login to access the full dashboard</p>
+      <form className={css(styles.form)} onSubmit={handleLoginSubmit}>
+        <label htmlFor="email" className={css(styles.label)}>
+          Email
+        </label>
+        <input
+          type="email"
+          name="user_email"
+          id="email"
+          className={css(styles.input)}
+          value={email}
+          onChange={handleChangeEmail}
+        />
+        <label htmlFor="password" className={css(styles.label)}>
+          Password
+        </label>
+        <input
+          type="password"
+          name="user_password"
+          id="password"
+          className={css(styles.input)}
+          value={password}
+          onChange={handleChangePassword}
+        />
+        <input
+          type="submit"
+          value="OK"
+          className={css(styles.button)}
+          disabled={!enableSubmit}
+        />
+      </form>
+    </div>
   );
 }
 

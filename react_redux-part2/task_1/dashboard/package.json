@@ -11,7 +11,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^2.5.0",
     "aphrodite": "^2.4.0",
     "axios": "^1.7.9",
     "identity-obj-proxy": "^3.0.0",
@@ -24,6 +23,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.24.8",
     "@babel/preset-react": "^7.24.7",
+    "@reduxjs/toolkit": "^2.11.2",
     "@testing-library/dom": "^10.3.1",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",

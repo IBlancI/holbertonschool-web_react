@@ -1,13 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
-import rootReducer from './rootReducer';
+import rootReducer from '../app/rootReducer'
 
 const store = configureStore({
-  reducer: rootReducer,
-  devTools: {
-    name: 'Holberton Dashboard',
-    trace: true,
-    traceLimit: 25
-  }
+    reducer: rootReducer,
 });
 
 export default store;

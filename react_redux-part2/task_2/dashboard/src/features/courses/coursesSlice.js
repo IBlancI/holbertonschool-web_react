@@ -1,54 +1,55 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import axios from 'axios';
 import { logout } from '../auth/authSlice';
+import axios from 'axios';
 
 const initialState = {
-  courses: [],
+    courses: [],
 };
 
-const BASE_URL = 'http://localhost:5173';
-const ENDPOINTS = {
-  courses: `${BASE_URL}/courses.json`,
-};
+const API_BASE_URL = "http://localhost:5173";
 
-// Async thunk to fetch courses from the API
-export const fetchCourses = createAsyncThunk(
-  'courses/fetchCourses',
-  async () => {
-    const result = await axios.get(ENDPOINTS.courses);
-    return result.data.courses;
-  }
+const ENDPOINTS = { courses: `${API_BASE_URL}/courses.json` };
+
+const fetchCourses = createAsyncThunk(
+    'courses/fetchCourses',
+    async () => {
+        const response = await axios.get(ENDPOINTS.courses);
+
+        const fetchedCourses = response.data.courses;
+        return fetchedCourses;
+    }
 );
 
 const coursesSlice = createSlice({
-  name: 'courses',
-  initialState,
-  reducers: {
-    // Mark a course as selected by its id
-    selectCourse: (state, { payload }) => {
-      const item = state.courses.find((c) => c.id === payload);
-      if (item) item.isSelected = true;
+    name: 'courses',
+    initialState,
+    reducers: {
+        selectCourse: (state, { payload }) => {
+            const course = state.courses.find(
+                course => course.id === payload)
+            if (course) {
+                course.isSelected = true;
+            }
+        },
+        unSelectCourse: (state, { payload }) => {
+            const course = state.courses.find(
+                course => course.id === payload)
+            if (course) {
+                course.isSelected = false;
+            }
+        }
     },
-    // Mark a course as unselected by its id
-    unSelectCourse: (state, { payload }) => {
-      const item = state.courses.find((c) => c.id === payload);
-      if (item) item.isSelected = false;
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchCourses.fulfilled, (state, action) => {
-        // Add isSelected: false to each course when fetched
-        state.courses = action.payload.map((course) => ({
-          ...course,
-          isSelected: false,
-        }));
-      })
-      .addCase(logout, (state) => {
-        state.courses = initialState.courses;
-      });
-  },
+
+    extraReducers: (builder) => {
+        builder.addCase(fetchCourses.fulfilled, (state, action) => {
+            state.courses = action.payload.map(course => ({...course, isSelected: false}));
+        });
+        builder.addCase(logout, (state) => {
+            state.courses = [];
+        });
+    }
 });
 
+export { fetchCourses };
 export const { selectCourse, unSelectCourse } = coursesSlice.actions;
 export default coursesSlice.reducer;

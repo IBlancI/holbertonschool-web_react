@@ -3,15 +3,25 @@ import { StyleSheet, css } from "aphrodite";
 import closeIcon from "../../assets/close-icon.png";
 import NotificationItem from "../NotificationItem/NotificationItem";
 
-const opacityAnimation = {
-  from: { opacity: 0.5 },
-  to: { opacity: 1 },
+const opacityKeyframes = {
+  from: {
+    opacity: 0.5,
+  },
+  to: {
+    opacity: 1,
+  },
 };
 
-const bounceAnimation = {
-  "0%": { transform: "translateY(0px)" },
-  "50%": { transform: "translateY(-5px)" },
-  "100%": { transform: "translateY(5px)" },
+const bounceKeyframes = {
+  "0%": {
+    transform: "translateY(0px)",
+  },
+  "50%": {
+    transform: "translateY(-5px)",
+  },
+  "100%": {
+    transform: "translateY(5px)",
+  },
 };
 
 const styles = StyleSheet.create({
@@ -68,7 +78,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff8f8",
     cursor: "pointer",
     ":hover": {
-      animationName: [opacityAnimation, bounceAnimation],
+      animationName: [opacityKeyframes, bounceKeyframes],
       animationDuration: "1s, 0.5s",
       animationIterationCount: "3, 3",
     },
@@ -103,13 +113,13 @@ const Notifications = memo(function Notifications({
                 <img src={closeIcon} alt="close icon" />
               </button>
               <ul className={css(styles.ul)}>
-                {notifications.map((notif) => (
+                {notifications.map((notification) => (
                   <NotificationItem
-                    id={notif.id}
-                    key={notif.id}
-                    type={notif.type}
-                    value={notif.value}
-                    html={notif.html}
+                    id={notification.id}
+                    key={notification.id}
+                    type={notification.type}
+                    value={notification.value}
+                    html={notification.html}
                     markAsRead={markNotificationAsRead}
                   />
                 ))}

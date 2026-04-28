@@ -27,42 +27,47 @@ const styles = StyleSheet.create({
 function CourseList({ courses = [] }) {
   return (
     <div className={css(styles.courses)}>
-      {courses.length > 0 ? (
-        <table id='CourseList' className={css(styles.table)}>
-          <thead>
-            <CourseListRow
-              textFirstCell="Available courses"
-              isHeader={true}
-            />
-            <CourseListRow
-              textFirstCell="Course name"
-              textSecondCell="Credit"
-              isHeader={true}
-            />
-          </thead>
-          <tbody>
-            {courses.map(course => (
-              <CourseListRow
-                key={course.id}
-                textFirstCell={course.name}
-                textSecondCell={course.credit}
+      {
+        courses.length > 0 ? 
+        (
+          <table id='CourseList' className={css(styles.table)}>
+            <thead>
+              <CourseListRow 
+                textFirstCell="Available courses" 
+                isHeader={true} 
               />
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <table id='CourseList' className={css(styles.table)}>
-          <thead>
-            <CourseListRow
-              isHeader={true}
-              textFirstCell="No course available yet"
-            />
-          </thead>
-        </table>
-      )}
+              <CourseListRow 
+                textFirstCell="Course name" 
+                textSecondCell="Credit" 
+                isHeader={true} 
+              />
+            </thead>
+            <tbody>
+              {
+                courses.map(course => (
+                  <CourseListRow 
+                    key={course.id} 
+                    textFirstCell={course.name} 
+                    textSecondCell={course.credit} 
+                  />
+                ))
+              }
+            </tbody>
+          </table>
+        ) : (
+          <table id='CourseList' className={css(styles.table)}>
+            <thead>
+              <CourseListRow 
+                isHeader={true} 
+                textFirstCell="No course available yet" 
+              />
+            </thead>
+          </table>
+        )
+      }
     </div>
   );
 }
 
 const CourseListWithLogging = WithLogging(CourseList);
-export default CourseListWithLogging;
+export default CourseListWithLogging

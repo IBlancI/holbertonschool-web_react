@@ -1,10 +1,9 @@
-import { useSelector, useDispatch } from 'react-redux';
 import { StyleSheet, css } from 'aphrodite';
-import CourseListRow from './CourseListRow/CourseListRow';
+import CourseListRow from '../CourseListRow/CourseListRow';
 import WithLogging from '../../components/HOC/WithLogging';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectCourse, unSelectCourse } from '../../features/courses/coursesSlice';
 
-// Aphrodite styles for the course list layout
 const styles = StyleSheet.create({
   courses: {
     margin: '130px auto',
@@ -31,10 +30,12 @@ function CourseList() {
   const { courses } = useSelector((state) => state.courses);
   const dispatch = useDispatch();
 
-  // Toggle course selection based on checkbox state
   const onChangeRow = (id, checked) => {
-    const actionCreator = checked ? selectCourse : unSelectCourse;
-    dispatch(actionCreator(id));
+    if (checked) {
+      dispatch(selectCourse(id));
+    } else {
+      dispatch(unSelectCourse(id));
+    }
   };
 
   return (
@@ -42,8 +43,15 @@ function CourseList() {
       {courses.length > 0 ? (
         <table id="CourseList" className={css(styles.table)}>
           <thead>
-            <CourseListRow textFirstCell="Available courses" isHeader={true} />
-            <CourseListRow textFirstCell="Course name" textSecondCell="Credit" isHeader={true} />
+            <CourseListRow
+              isHeader={true}
+              textFirstCell="Available courses"
+            />
+            <CourseListRow
+              isHeader={true}
+              textFirstCell="Course name"
+              textSecondCell="Credit"
+            />
           </thead>
           <tbody>
             {courses.map((course) => (
@@ -52,8 +60,8 @@ function CourseList() {
                 id={course.id}
                 textFirstCell={course.name}
                 textSecondCell={course.credit}
-                onChangeRow={onChangeRow}
-                isSelected={course.isSelected || false}
+                isSelected={course.isSelected}
+                changeRow={onChangeRow}
               />
             ))}
           </tbody>
@@ -61,7 +69,10 @@ function CourseList() {
       ) : (
         <table id="CourseList" className={css(styles.table)}>
           <thead>
-            <CourseListRow isHeader={true} textFirstCell="No course available yet" />
+            <CourseListRow
+              isHeader={true}
+              textFirstCell="No course available yet"
+            />
           </thead>
         </table>
       )}
@@ -69,4 +80,5 @@ function CourseList() {
   );
 }
 
-export default WithLogging(CourseList);
+const CourseListWithLogging = WithLogging(CourseList);
+export default CourseListWithLogging;

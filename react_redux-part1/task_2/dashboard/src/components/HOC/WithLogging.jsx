@@ -3,17 +3,19 @@ import { Component } from 'react';
 const WithLogging = (WrappedComponent) => {
   class WithLoggingComponent extends Component {
     componentDidMount() {
-      const name = WrappedComponent.name
+      const componentName = WrappedComponent.name
         ? WrappedComponent.name
         : 'Component';
-      console.log(`Component ${name} is mounted`);
+
+      console.log(`Component ${componentName} is mounted`);
     }
 
     componentWillUnmount() {
-      const name = WrappedComponent.name
+      const componentName = WrappedComponent.name
         ? WrappedComponent.name
         : 'Component';
-      console.log(`Component ${name} is going to unmount`);
+
+      console.log(`Component ${componentName} is going to unmount`);
     }
 
     render() {

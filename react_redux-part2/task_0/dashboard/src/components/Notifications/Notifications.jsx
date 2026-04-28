@@ -1,11 +1,12 @@
-import { memo, useRef, useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { memo, useRef } from "react";
 import { StyleSheet, css } from "aphrodite";
-import { markNotificationAsRead } from '../../features/notifications/notificationsSlice';
-import NotificationItem from '../NotificationItem/NotificationItem';
-import closeIcon from '../../assets/close-icon.png';
+import closeIcon from "../../assets/close-icon.png";
+import NotificationItem from "../NotificationItem/NotificationItem";
+import {
+  markNotificationAsRead,
+} from '../../features/notifications/notificationsSlice'
+import { useDispatch, useSelector } from "react-redux";
 
-// Fade-in animation keyframes
 const opacityKeyframes = {
   from: {
     opacity: 0.5,
@@ -38,7 +39,6 @@ const styles = StyleSheet.create({
     marginTop: "20px",
     opacity: 0,
     visibility: "hidden",
-    transition: "opacity 0.3s ease, visibility 0.3s ease",
     "@media (max-width: 900px)": {
       position: "fixed",
       top: 0,
@@ -95,54 +95,67 @@ const styles = StyleSheet.create({
   },
 });
 
-
-// Memoized to prevent unnecessary re-renders
-const Notifications = memo(function Notifications () {
+const Notifications = memo(function Notifications() {
+  const {
+    notifications,
+  } = useSelector(state => state.notifications);
   const dispatch = useDispatch();
-  const notifications = useSelector((state) => state.notifications.notifications);
 
-  // Ref to the drawer DOM element for toggling visibility via CSS classes
-  const drawerRef = useRef(null);
+  const DrawerRef = useRef(null);
+  const isVisible = useRef(false);
 
-  const toggleDrawer = useCallback(() => {
-    if (drawerRef.current) {
-      drawerRef.current.classList.toggle(css(styles.visible));
+  const handleToggleDrawer = () => {
+    isVisible.current = !isVisible.current;
+
+    if (isVisible.current) {
+      DrawerRef.current.className = css(styles.notificationItems, styles.visible);
+    } else {
+      DrawerRef.current.className = css(styles.notificationItems);
     }
-  }, []);
-
-  const onMarkAsRead = useCallback((id) => {
+  }
+  const handleMarkNotificationAsRead = (id) => {
     dispatch(markNotificationAsRead(id));
-  }, [dispatch]);
-
+  }
   return (
     <>
-      <div className={css(styles.menuItem)} onClick={toggleDrawer}>
+      <div
+        className={css(styles.menuItem)}
+        onClick={() => handleToggleDrawer()}
+      >
         Your notifications
       </div>
-      <div className={`${css(styles.notificationItems)} visible`} ref={drawerRef} >
-        {notifications.length > 0 ? (
-          <>
-            <p className={css(styles.p)}>Here is the list of notifications</p>
-            <button onClick={toggleDrawer} aria-label="Close" className={css(styles.button)}>
-              <img src={closeIcon} alt="close icon" />
-            </button>
-            <ul className={css(styles.ul)}>
-              {notifications.map((notif) => (
-                <NotificationItem
-                  key={notif.id}
-                  id={notif.id}
-                  type={notif.type}
-                  value={notif.value}
-                  html={notif.html}
-                  markAsRead={onMarkAsRead}
-                />
-              ))}
-            </ul>
-          </>
-        ) : (
-          <p className={css(styles.p)}>No new notifications for now</p>
-        )}
-      </div>
+      {
+        <div
+          ref={DrawerRef}
+          className={css(styles.notificationItems)}>
+          {notifications.length > 0 ? (
+            <>
+              <p className={css(styles.p)}>Here is the list of notifications</p>
+              <button
+                onClick={() => handleToggleDrawer()}
+                aria-label="Close"
+                className={css(styles.button)}
+              >
+                <img src={closeIcon} alt="close icon" />
+              </button>
+              <ul className={css(styles.ul)}>
+                {notifications.map((notification) => (
+                  <NotificationItem
+                    id={notification.id}
+                    key={notification.id}
+                    type={notification.type}
+                    value={notification.value}
+                    html={notification.html}
+                    markAsRead={handleMarkNotificationAsRead}
+                  />
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className={css(styles.p)}>No new notifications for now</p>
+          )}
+        </div>
+      }
     </>
   );
 });

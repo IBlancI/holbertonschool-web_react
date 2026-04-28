@@ -1,238 +1,149 @@
-import { act, render, waitFor } from "@testing-library/react";
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import mockAxios from "jest-mock-axios";
-import App from "../App";
-import authSlice, { logout, login } from "../features/auth/authSlice";
-import notificationsSlice from "../features/notifications/notificationsSlice";
-import coursesSlice from "../features/courses/coursesSlice";
+import { render, screen, waitFor } from '@testing-library/react';
+import App from '../App';
+import { Provider } from 'react-redux';
+import mockAxios from 'jest-mock-axios';
+import { configureStore } from '@reduxjs/toolkit';
+import rootReducer from '../app/rootReducer';
 
-const NOTIFICATIONS_DATA = [
-  {
-    id: "5debd764507712e7a1307303",
-    context: {
-      type: "urgent",
-      isRead: false,
-      value:
-        "ut labore et dolore magna aliqua. Dignissim convallis aenean et tortor at risus viverra adipiscing. Ac tortor dignissim convallis aenean et.",
-    },
-  },
-  {
-    id: "5debd76444dd4dafea89d53b",
-    context: {
-      type: "urgent",
-      isRead: false,
-      value:
-        "Non diam phasellus vestibulum lorem sed risus ultricies. Tellus mauris a diam maecenas sed",
-    },
-  },
-  {
-    id: "5debd7644e561e022d66e61a",
-    context: {
-      type: "urgent",
-      isRead: false,
-      value:
-        "In hendrerit gravida rutrum quisque non tellus orci. Gravida dictum fusce ut placerat orci nulla pellentesque dignissim enim. Lorem mollis aliquam ut porttitor",
-    },
-  },
-  {
-    id: "5debd7644aaed86c97bf9d5e",
-    context: {
-      type: "default",
-      isRead: false,
-      value: "Cursus metus aliquam eleifend mi in nulla posuere.",
-    },
-  },
-  {
-    id: "5debd76413f0d5e5429c28a0",
-    context: {
-      type: "default",
-      isRead: false,
-      value: "Quam viverra orci sagittis eu volutpat odio facilisis mauris sit",
-    },
-  },
-  {
-    id: "5debd764c1127bc5a490a4d0",
-    context: {
-      type: "default",
-      isRead: false,
-      value: "Cursus risus at ultrices mi.",
-    },
-  },
-  {
-    id: "5debd764a4f11eabef05a81d",
-    context: {
-      type: "default",
-      isRead: false,
-      value:
-        "Ac placerat vestibulum lectus mauris ultrices eros in cursus. Amet nisl suscipit adipiscing bibendum est ultricies integer. Lorem donec massa sapien faucibus et molestie ac",
-    },
-  },
-  {
-    id: "5debd764af0fdd1fc815ad9b",
-    context: {
-      type: "urgent",
-      isRead: false,
-      value: "Nulla malesuada pellentesque elit eget gravida cum sociis",
-    },
-  },
-  {
-    id: "5debd76468cb5b277fd125f4",
-    context: {
-      type: "urgent",
-      isRead: false,
-      value:
-        "Elit eget gravida cum sociis natoque penatibus et. Congue mauris rhoncus aenean vel",
-    },
-  },
-  {
-    id: "5debd764de9fa684468cdc0b",
-    context: {
-      type: "default",
-      isRead: false,
-      value:
-        "Leo vel fringilla est ullamcorper. Volutpat consequat mauris nunc congue",
-    },
-  },
-];
+afterEach(() => {
+  mockAxios.reset();
+});
 
-const COURSES_DATA = [
-  { id: 1, name: "ES6", credit: 60 },
-  { id: 2, name: "Webpack", credit: 20 },
-  { id: 3, name: "React", credit: 40 },
-];
+const createTestStore = (preloadedState) => {
+  return configureStore({
+    reducer: rootReducer,
+    preloadedState,
+  });
+};
 
-describe("App Component Integration Tests", () => {
-  let store;
+const notLoggedInState = {
+  auth: {
+    isLoggedIn: false,
+    user: {
+      email: '',
+      password: '',
+    },
+  },
+  notifications: {
+    notifications: [],
+    loading: false,
+  },
+  courses: {
+    courses: [],
+  },
+};
 
-  beforeEach(() => {
-    store = configureStore({
-      reducer: {
-        auth: authSlice,
-        courses: coursesSlice,
-        notifications: notificationsSlice,
+const mockNotificationsResponse = {
+  data: {
+    notifications: [
+      {
+        id: 1,
+        context: { type: 'default', isRead: false, value: 'New course available' },
       },
-    });
+      {
+        id: 2,
+        context: { type: 'urgent', isRead: false, value: 'New resume available' },
+      },
+      {
+        id: 3,
+        context: { type: 'urgent', isRead: false, value: 'New project to review' },
+      },
+    ],
+  },
+};
+
+const mockCoursesResponse = {
+  data: {
+    courses: [
+      { id: 1, name: 'ES6', credit: 60, isSelected: false },
+      { id: 2, name: 'Webpack', credit: 20, isSelected: false },
+      { id: 3, name: 'React', credit: 40, isSelected: false },
+    ],
+  },
+};
+
+const isLoggedInState = {
+  auth: {
+    isLoggedIn: true,
+    user: {
+      email: 'nickydoll@dragrace.fr',
+      password: 'pichecometrue',
+    },
+  },
+  notifications: {
+    notifications: [],
+    loading: false,
+  },
+  courses: {
+    courses: [],
+  },
+};
+
+test('The App component renders Login by default (user not logged in)', async () => {
+  const store = createTestStore(notLoggedInState);
+
+  render(
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+
+  mockAxios.mockResponse(mockNotificationsResponse);
+
+  await waitFor(() => {
+    const emailLabelElement = screen.getByLabelText(/email/i);
+    const passwordLabelElement = screen.getByLabelText(/password/i);
+    const buttonElements = screen.getAllByRole('button', { name: /ok/i });
+
+    expect(emailLabelElement).toBeInTheDocument();
+    expect(passwordLabelElement).toBeInTheDocument();
+    expect(buttonElements.length).toBeGreaterThanOrEqual(1);
   });
+});
 
-  afterEach(() => {
-    mockAxios.reset();
+test('The App component renders Courses when user is logged in', async () => {
+  const store = createTestStore(isLoggedInState);
+
+  render(
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+
+  mockAxios.mockResponse(mockNotificationsResponse);
+  mockAxios.mockResponse(mockCoursesResponse);
+
+  await waitFor(() => {
+    expect(screen.getByText('ES6')).toBeInTheDocument();
+    expect(screen.getByText('Webpack')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /course list/i })).toBeInTheDocument();
+
+    expect(store.getState().courses.courses).toEqual(mockCoursesResponse.data.courses);
   });
+});
 
-  const renderWithStore = () => {
-    return render(
-      <Provider store={store}>
-        <App />
-      </Provider>
-    );
-  };
+test('The App component renders Notifications when user is not logged in', async () => {
+  const store = createTestStore(notLoggedInState);
+  const flattenedNotifications = [
+    { id: 1, type: 'default', isRead: false, value: 'New course available' },
+    { id: 2, type: 'urgent', isRead: false, value: 'New resume available' },
+    { id: 3, type: 'urgent', isRead: false, value: 'New project to review' },
+  ];
 
-  test("should NOT populate courses when not logged in", async () => {
-    renderWithStore();
+  render(
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
 
-    mockAxios.mockResponse({ data: NOTIFICATIONS_DATA });
+  mockAxios.mockResponse(mockNotificationsResponse);
 
-    await waitFor(() => {
-      expect(store.getState().courses.courses).toHaveLength(0);
+  await waitFor(() => {
+    const titleElement = screen.getByText(/Here is the list of notifications/i);
+    const buttonElement = screen.getByRole('button', { name: /close/i });
 
-      const notifications = store.getState().notifications.notifications;
-      expect(notifications).toHaveLength(10);
-      expect(notifications).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: "5debd764507712e7a1307303",
-            type: "urgent",
-            isRead: false,
-            value: expect.stringContaining("ut labore et dolore magna aliqua"),
-          }),
-          expect.objectContaining({
-            id: "5debd76444dd4dafea89d53b",
-            type: "urgent",
-            isRead: false,
-            value: expect.stringContaining("Non diam phasellus vestibulum"),
-          }),
-          expect.objectContaining({
-            id: "5debd7644aaed86c97bf9d5e",
-            type: "default",
-            isRead: false,
-            value: "Cursus metus aliquam eleifend mi in nulla posuere.",
-          }),
-          expect.objectContaining({
-            id: "5debd764af0fdd1fc815ad9b",
-            type: "urgent",
-            isRead: false,
-            value: "Nulla malesuada pellentesque elit eget gravida cum sociis",
-          }),
-        ])
-      );
-    });
-  });
-
-  test("should populate courses WHEN logged in", async () => {
-    store.dispatch(
-      login({
-        email: "test@example.com",
-        password: "password123",
-      })
-    );
-
-    renderWithStore();
-
-    mockAxios.mockResponse({ data: NOTIFICATIONS_DATA });
-
-    mockAxios.mockResponse({ data: { courses: COURSES_DATA } });
-
-    await waitFor(() => {
-      expect(store.getState().courses.courses).toEqual([
-        { id: 1, name: "ES6", credit: 60, isSelected: false },
-        { id: 2, name: "Webpack", credit: 20, isSelected: false },
-        { id: 3, name: "React", credit: 40, isSelected: false },
-      ]);
-
-      const notifications = store.getState().notifications.notifications;
-      expect(notifications).toHaveLength(10);
-      expect(notifications).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: "5debd7644e561e022d66e61a",
-            type: "urgent",
-            isRead: false,
-            value: expect.stringContaining("In hendrerit gravida rutrum"),
-          }),
-          expect.objectContaining({
-            id: "5debd764de9fa684468cdc0b",
-            type: "default",
-            isRead: false,
-            value:
-              "Leo vel fringilla est ullamcorper. Volutpat consequat mauris nunc congue",
-          }),
-        ])
-      );
-    });
-  });
-
-  test("should CLEAR courses on logout", async () => {
-    store.dispatch(
-      login({
-        email: "test@example.com",
-        password: "password123",
-      })
-    );
-
-    renderWithStore();
-
-    mockAxios.mockResponse({ data: NOTIFICATIONS_DATA });
-    mockAxios.mockResponse({ data: { courses: COURSES_DATA } });
-
-    await waitFor(() => {
-      expect(store.getState().courses.courses).toHaveLength(3);
-    });
-
-    act(() => store.dispatch(logout()));
-
-    await waitFor(() => {
-      expect(store.getState().courses.courses).toHaveLength(0);
-      expect(store.getState().notifications.notifications).toHaveLength(10);
-    });
+    expect(titleElement).toBeInTheDocument();
+    expect(buttonElement).toBeInTheDocument();
+    expect(store.getState().notifications.notifications).toEqual(flattenedNotifications);
   });
 });

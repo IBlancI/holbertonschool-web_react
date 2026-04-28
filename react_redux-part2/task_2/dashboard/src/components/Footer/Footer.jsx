@@ -1,5 +1,5 @@
-import { useSelector } from 'react-redux';
 import { getCurrentYear, getFooterCopy } from "../../utils/utils";
+import { useSelector } from 'react-redux';
 import { StyleSheet, css } from "aphrodite";
 
 const styles = StyleSheet.create({
@@ -21,8 +21,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Footer() {
-  const { isLoggedIn } = useSelector((state) => state.auth);
-
+  const { isLoggedIn } = useSelector(state => state.auth);
   return (
     <div className={css(styles.footer)}>
       <p className={css(styles.p)}>

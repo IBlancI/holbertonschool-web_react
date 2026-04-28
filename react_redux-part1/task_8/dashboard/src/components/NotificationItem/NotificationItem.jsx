@@ -31,28 +31,29 @@ const NotificationItem = memo(function NotificationItem({
   markAsRead,
   id,
 }) {
-  const style = type === "default" ? styles.default : styles.urgent;
-
+  const itemStyle = type === "default" ? styles.default : styles.urgent;
+  // this console.log is only for test purposes and not mentionned/required in the student code
+  // console.log(`Rendering NotificationItem with id: ${id}, type: ${type}, value: ${value}`);
   if (html !== undefined) {
     return (
       <li
-        className={css(style)}
+        className={css(itemStyle)}
         data-notification-type={type}
         dangerouslySetInnerHTML={html}
         onClick={() => markAsRead(id)}
       ></li>
     );
+  } else {
+    return (
+      <li
+        className={css(itemStyle)}
+        data-notification-type={type}
+        onClick={() => markAsRead(id)}
+      >
+        {value}
+      </li>
+    );
   }
-
-  return (
-    <li
-      className={css(style)}
-      data-notification-type={type}
-      onClick={() => markAsRead(id)}
-    >
-      {value}
-    </li>
-  );
 });
 
 export default NotificationItem;

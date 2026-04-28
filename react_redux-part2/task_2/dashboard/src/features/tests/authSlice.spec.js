@@ -1,34 +1,28 @@
 import authReducer, { login, logout } from '../auth/authSlice';
 
-describe('authSlice', () => {
-  const initialState = {
-    user: {
-      email: '',
-      password: '',
-    },
-    isLoggedIn: false,
-  };
+test('The authSlice should return the correct initial state by default', () => {
+    const state = authReducer(undefined, { type: 'unknown' });
+    expect(state.user.email).toBe('');
+    expect(state.user.password).toBe('');
+    expect(state.isLoggedIn).toBe(false);
+})
 
-  test('should return the initial state', () => {
-    expect(authReducer(undefined, { type: 'unknown' })).toEqual(initialState);
-  });
+test('The authSlice updates the state correctly when the login action is dispatched', () => {
+    const previousState = { user: { email: '', password: '' }, isLoggedIn: false };
+    const action = login({ email: 'michelle.visage@dragrace.com', password: 'sashayaway'});
+    const newState = authReducer(previousState, action);
+    
+    expect(newState.user.email).toBe('michelle.visage@dragrace.com');
+    expect(newState.user.password).toBe('sashayaway')
+    expect(newState.isLoggedIn).toBe(true);
+})
 
-  test('should handle login', () => {
-    const user = { email: 'test@example.com', password: 'password123' };
-    const action = login(user);
-    const expectedState = {
-      user,
-      isLoggedIn: true,
-    };
-    expect(authReducer(initialState, action)).toEqual(expectedState);
-  });
+test('The authSlice resets the state correctly when the logout action is dispatched', () => {
+    const previousState = { user: { email: 'michelle.visage@dragrace.com', password: 'sashayaway' }, isLoggedIn: true };
+    const action = logout()
+    const newState = authReducer(previousState, action);
 
-  test('should handle logout', () => {
-    const loggedInState = {
-      user: { email: 'test@example.com', password: 'password123' },
-      isLoggedIn: true,
-    };
-    const action = logout();
-    expect(authReducer(loggedInState, action)).toEqual(initialState);
-  });
-});
+    expect(newState.user.email).toBe('');
+    expect(newState.user.password).toBe('');
+    expect(newState.isLoggedIn).toBe(false);
+})

@@ -1,41 +1,15 @@
-import { memo } from 'react';
-import { StyleSheet, css } from "aphrodite";
+import { memo } from "react";
 
-const styles = StyleSheet.create({
-  default: {
-    color: "blue",
-    "@media (max-width: 900px)": {
-      width: "100%",
-      borderBottom: "1px solid black",
-      fontSize: "20px",
-      padding: "10px 8px",
-      listStyle: "none",
-    },
-  },
-  urgent: {
-    color: "red",
-    "@media (max-width: 900px)": {
-      width: "100%",
-      borderBottom: "1px solid black",
-      fontSize: "20px",
-      padding: "10px 8px",
-      listStyle: "none",
-    },
-  },
-});
-
-// Single notification row - color depends on type (default=blue, urgent=red)
 const NotificationItem = memo(function NotificationItem({
-  id,
   type,
   value,
   markAsRead,
+  id,
 }) {
-  const itemStyle = type === "default" ? styles.default : styles.urgent;
-
+  // this console.log is only for test purposes and not mentionned/required in the student code
   return (
     <li
-      className={css(itemStyle)}
+      style={{ color: type === 'urgent' ? 'red' : 'blue' }}
       data-notification-type={type}
       onClick={() => markAsRead(id)}
     >

@@ -1,64 +1,82 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import NotificationItem from './NotificationItem';
 
-describe('NotificationItem', () => {
+
+test('it should call markAsRead with the correct id when the notification item is clicked', () => {
   const mockMarkAsRead = jest.fn();
+  const props = {
+    id: 42,
+    type: 'default',
+    value: 'Test notification',
+    markAsRead: mockMarkAsRead,
+  };
 
-  test('displays a default type notification', () => {
-    render(
-      <NotificationItem
-        type="default"
-        value="New course available"
-        markAsRead={mockMarkAsRead}
-        id={1}
-      />
-    );
-    const item = screen.getByRole('listitem');
-    expect(item).toHaveTextContent('New course available');
-    expect(item).toHaveAttribute('data-notification-type', 'default');
+  render(<NotificationItem {...props} />);
+
+  const liElement = screen.getByRole('listitem');
+
+  fireEvent.click(liElement);
+
+  expect(mockMarkAsRead).toHaveBeenCalledTimes(1);
+  expect(mockMarkAsRead).toHaveBeenCalledWith(42);
+});
+
+describe('NotificationItem - React.memo behavior', () => {
+  let markAsRead;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    markAsRead = jest.fn();
   });
 
-  test('displays an urgent type notification', () => {
-    render(
+  test('should update when props change', () => {
+    const { rerender, container } = render(
       <NotificationItem
+        id={1}
         type="urgent"
-        value="Urgent requirement: System update needed"
-        markAsRead={mockMarkAsRead}
-        id={2}
+        value="New notification"
+        markAsRead={markAsRead}
       />
     );
 
-    const item = screen.getByRole('listitem');
-    expect(item).toHaveAttribute('data-notification-type', 'urgent');
-    expect(item).toHaveTextContent('Urgent requirement: System update needed');
+    const firstRender = container.querySelector('[data-notification-type]').textContent;
+
+    rerender(
+      <NotificationItem
+        id={1}
+        type="urgent"
+        value="Updated notification"
+        markAsRead={markAsRead}
+      />
+    );
+
+    const secondRender = container.querySelector('[data-notification-type]').textContent;
+    expect(secondRender).not.toBe(firstRender);
+    expect(secondRender).toBe('Updated notification');
   });
 
-  test('renders default notification showing its value text', () => {
-    render(
+  test('should not re-render when props do not change', () => {
+    const { rerender, container } = render(
       <NotificationItem
-        type="default"
-        value="New course available"
-        markAsRead={mockMarkAsRead}
         id={1}
+        type="urgent"
+        value="New notification"
+        markAsRead={markAsRead}
       />
     );
 
-    const item = screen.getByRole('listitem');
-    expect(item).toHaveAttribute('data-notification-type', 'default');
-    expect(item).toHaveTextContent('New course available');
-  });
+    const firstElement = container.querySelector('[data-notification-type]');
 
-  test('invokes markAsRead callback on click', () => {
-    render(
+    rerender(
       <NotificationItem
-        type="default"
-        value="New course available"
-        markAsRead={mockMarkAsRead}
         id={1}
+        type="urgent"
+        value="New notification"
+        markAsRead={markAsRead}
       />
     );
-    const item = screen.getByRole('listitem');
-    fireEvent.click(item);
-    expect(mockMarkAsRead).toHaveBeenCalledTimes(1);
+
+    const secondElement = container.querySelector('[data-notification-type]');
+    expect(secondElement.textContent).toBe(firstElement.textContent);
   });
 });

@@ -1,65 +1,82 @@
 import { render, screen } from '@testing-library/react';
+import Footer from './Footer';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import Footer from './Footer';
-import authReducer from '../../features/auth/authSlice';
+import rootReducer from '../../app/rootReducer';
 
-const buildTestStore = (preloaded) => {
+const createTestStore = (preloadedState) => {
   return configureStore({
-    reducer: {
-      auth: authReducer,
-    },
-    preloadedState: preloaded,
+    reducer: rootReducer,
+    preloadedState,
   });
 };
 
-const renderWithStore = (component, preloaded) => {
-  const store = buildTestStore(preloaded);
-  return render(
-    <Provider store={store}>
-      {component}
-    </Provider>
-  );
+const notLoggedInState = {
+  auth: {
+    isLoggedIn: false,
+    user: {
+      email: "",
+      password: "",
+    }
+  },
+  notifications: {
+    notifications: [],
+    displayDrawer: true
+  },
+  courses: {
+    courses: []
+  }
+};
+
+const isLoggedInState = {
+  auth: {
+    isLoggedIn: true,
+    user: {
+      email: "nickydoll@dragrace.fr",
+      password: "pichecometrue",
+    }
+  },
+  notifications: {
+    notifications: [],
+    displayDrawer: true
+  },
+  courses: {
+    courses: []
+  }
 };
 
 test('It should render footer with copyright text', () => {
-  const preloaded = {
-    auth: {
-      user: { email: '', password: '' },
-      isLoggedIn: false,
-    },
-  };
+  const store = createTestStore(notLoggedInState)
 
-  renderWithStore(<Footer />, preloaded);
+  render(
+    <Provider store={store}>
+      <Footer />
+    </Provider>)
 
   const footerParagraph = screen.getByText(/copyright/i);
-  expect(footerParagraph).toHaveTextContent(new RegExp(`copyright ${(new Date()).getFullYear()}`, 'i'));
-  expect(footerParagraph).toHaveTextContent(/holberton school/i);
+
+  expect(footerParagraph).toHaveTextContent(new RegExp(`copyright ${(new Date()).getFullYear()}`, 'i'))
+  expect(footerParagraph).toHaveTextContent(/holberton school/i)
 });
 
 test('Contact us link is not displayed when user is logged out', () => {
-  const preloaded = {
-    auth: {
-      user: { email: '', password: '' },
-      isLoggedIn: false,
-    },
-  };
+  const store = createTestStore(notLoggedInState)
 
-  renderWithStore(<Footer />, preloaded);
-
+  render(
+    <Provider store={store}>
+      <Footer />
+    </Provider>)
   const contactLink = screen.queryByText(/contact us/i);
   expect(contactLink).not.toBeInTheDocument();
 });
 
 test('Contact us link is displayed when user is logged in', () => {
-  const preloaded = {
-    auth: {
-      user: { email: 'test@test.com', password: 'password123' },
-      isLoggedIn: true,
-    },
-  };
+  const store = createTestStore(isLoggedInState)
 
-  renderWithStore(<Footer />, preloaded);
+  render(
+    <Provider store={store}>
+      <Footer />
+    </Provider>)
 
   const contactLink = screen.getByText(/contact us/i);
   expect(contactLink).toBeInTheDocument();

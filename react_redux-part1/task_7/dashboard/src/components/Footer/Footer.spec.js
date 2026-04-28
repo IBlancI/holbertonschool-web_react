@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Footer from './Footer';
+import { getCurrentYear, getFooterCopy } from '../../utils/utils';
 
 test('It should render footer with copyright text', () => {
   const defaultUser = {
@@ -8,11 +9,12 @@ test('It should render footer with copyright text', () => {
     isLoggedIn: false
   };
 
-  render(<Footer user={defaultUser} />);
+  render(<Footer user={defaultUser} />)
 
   const footerParagraph = screen.getByText(/copyright/i);
-  expect(footerParagraph).toHaveTextContent(new RegExp(`copyright ${(new Date()).getFullYear()}`, 'i'));
-  expect(footerParagraph).toHaveTextContent(/holberton school/i);
+
+  expect(footerParagraph).toHaveTextContent(new RegExp(`copyright ${(new Date()).getFullYear()}`, 'i'))
+  expect(footerParagraph).toHaveTextContent(/holberton school/i)
 });
 
 test('Contact us link is not displayed when user is logged out', () => {

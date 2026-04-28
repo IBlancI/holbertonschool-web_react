@@ -8,12 +8,12 @@ test('It should render a heading with the title prop value', () => {
     </BodySection>
   );
 
-  const titleEl = screen.getByRole('heading', { name: /test title/i });
-  expect(titleEl).toBeInTheDocument();
-  expect(titleEl.tagName).toBe('H2');
+  const titleElement = screen.getByRole('heading', { name: /test title/i });
+  expect(titleElement).toBeInTheDocument();
+  expect(titleElement.tagName).toBe('H2');
 });
 
-test('It should render any children passed to it', () => {
+test('It should render any number of children passed to it', () => {
   render(
     <BodySection title="Test Title">
       <p>Child 1</p>

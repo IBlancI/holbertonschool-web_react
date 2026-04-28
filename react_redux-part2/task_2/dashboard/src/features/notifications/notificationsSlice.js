@@ -1,30 +1,29 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { getLatestNotification } from "../../utils/utils";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { getLatestNotification } from '../../utils/utils';
+import axios from 'axios';
 
 const initialState = {
   notifications: [],
   loading: false,
-};
+}
 
 const API_BASE_URL = "http://localhost:5173";
-const ENDPOINTS = {
-  notifications: `${API_BASE_URL}/notifications.json`,
-};
 
-export const fetchNotifications = createAsyncThunk(
-  "notifications/fetchNotifications",
+const ENDPOINTS = { notifications: `${API_BASE_URL}/notifications.json` };
+
+const fetchNotifications = createAsyncThunk(
+  'notifications/fetchNotifications',
   async () => {
     const response = await axios.get(ENDPOINTS.notifications);
     const latestNotif = {
       id: 3,
       type: "urgent",
-      html: { __html: getLatestNotification() },
+      html: { __html: getLatestNotification() }
     };
 
     const currentNotifications = response.data.notifications;
     const indexToReplace = currentNotifications.findIndex(
-      (notification) => notification.id === 3
+      notification => notification.id === 3
     );
 
     const updatedNotifications = [...currentNotifications];
@@ -33,37 +32,35 @@ export const fetchNotifications = createAsyncThunk(
     } else {
       updatedNotifications.push(latestNotif);
     }
-
     return updatedNotifications;
   }
-);
+)
 
 const notificationsSlice = createSlice({
-  name: "notifications",
+  name: 'notifications',
   initialState,
   reducers: {
     markNotificationAsRead: (state, action) => {
-      const notificationId = action.payload;
       state.notifications = state.notifications.filter(
-        (notification) => notification.id !== notificationId
+        notification => notification.id !== action.payload
       );
-      console.log(`Notification ${notificationId} has been marked as read`);
+      console.log(`Notification ${action.payload} has been marked as read`);
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchNotifications.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchNotifications.fulfilled, (state, action) => {
-        state.loading = false;
-        state.notifications = action.payload;
-      })
-      .addCase(fetchNotifications.rejected, (state) => {
-        state.loading = false;
-      });
-  },
+    builder.addCase(fetchNotifications.fulfilled, (state, action) => {
+      state.notifications = action.payload;
+      state.loading = false;
+    });
+    builder.addCase(fetchNotifications.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(fetchNotifications.rejected, (state) => {
+      state.loading = false;
+    });
+  }
 });
 
 export const { markNotificationAsRead } = notificationsSlice.actions;
+export { fetchNotifications };
 export default notificationsSlice.reducer;

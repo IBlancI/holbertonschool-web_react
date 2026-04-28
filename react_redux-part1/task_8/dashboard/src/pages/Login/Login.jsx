@@ -1,8 +1,8 @@
-import { useDispatch } from 'react-redux';
-import { login } from '../../features/auth/authSlice';
 import { StyleSheet, css } from "aphrodite";
 import WithLogging from "../../components/HOC/WithLogging";
 import useLogin from "../../hooks/useLogin";
+import { login } from '../../features/auth/authSlice'
+import { useDispatch } from 'react-redux'
 
 const styles = StyleSheet.create({
   body: {
@@ -58,8 +58,11 @@ const styles = StyleSheet.create({
   },
 });
 
-function Login() {
-  const dispatch = useDispatch();
+const Login = () => {
+  const dispatch = useDispatch()
+  const onLogin = (email, password) => {
+    dispatch(login({ email, password }));
+  }
   const {
     email,
     password,
@@ -67,12 +70,12 @@ function Login() {
     handleChangeEmail,
     handleChangePassword,
     handleLoginSubmit
-  } = useLogin((email, password) => dispatch(login({ email, password })));
+  } = useLogin(onLogin);
 
   return (
     <div className={css(styles.body)}>
       <p className={css(styles.p)}>Login to access the full dashboard</p>
-      <form aria-label="form" className={css(styles.form)} onSubmit={handleLoginSubmit}>
+      <form className={css(styles.form)} onSubmit={handleLoginSubmit}>
         <label htmlFor="email" className={css(styles.label)}>
           Email
         </label>

@@ -29,7 +29,7 @@ export function appReducer(state = initialState, action) {
           isLoggedIn: true
         }
       };
-
+      
     case APP_ACTIONS.LOGOUT:
       return {
         ...state,
@@ -63,7 +63,7 @@ export function appReducer(state = initialState, action) {
       return {
         ...state,
         notifications: state.notifications.filter(
-          n => n.id !== action.payload
+          notification => notification.id !== action.payload
         )
       };
 

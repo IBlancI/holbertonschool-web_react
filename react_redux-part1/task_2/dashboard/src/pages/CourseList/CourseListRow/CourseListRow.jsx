@@ -16,15 +16,17 @@ export default function CourseListRow({
 }) {
   const rowStyle = isHeader ? styles.headerRow : styles.row;
 
-  return isHeader ? (
-    <tr className={css(rowStyle)}>
-      <th colSpan={textSecondCell ? 1 : 2}>{textFirstCell}</th>
-      {textSecondCell ? <th>{textSecondCell}</th> : null}
-    </tr>
-  ) : (
-    <tr className={css(rowStyle)}>
-      <td>{textFirstCell}</td>
-      <td>{textSecondCell}</td>
-    </tr>
-  );
+  return (
+    isHeader ? (
+      <tr className={css(rowStyle)}>
+        <th colSpan={textSecondCell ? 1 : 2}>{textFirstCell}</th>
+        {textSecondCell ? <th>{textSecondCell}</th> : null}
+      </tr>
+    ) : (
+      <tr className={css(rowStyle)}>
+        <td>{textFirstCell}</td>
+        <td>{textSecondCell}</td>
+      </tr>
+    )
+  )
 }

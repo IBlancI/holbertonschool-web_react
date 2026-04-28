@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     borderTop: "5px red solid",
     gap: "10px",
   },
-  text: {
+  p: {
     fontFamily: "Roboto, sans-serif",
     fontStyle: "italic",
     fontSize: "1.3rem",
@@ -22,11 +22,11 @@ const styles = StyleSheet.create({
 export default function Footer({ user }) {
   return user ? (
     <div className={css(styles.footer)}>
-      <p className={css(styles.text)}>
+      <p className={css(styles.p)}>
         Copyright {getCurrentYear()} - {getFooterCopy(true)}
       </p>
       {user.isLoggedIn && (
-        <span className={css(styles.text)}>
+        <span className={css(styles.p)}>
           <a href="#">Contact us</a>
         </span>
       )}

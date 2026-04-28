@@ -11,10 +11,10 @@ import BodySectionWithMarginBottom from './components/BodySectionWithMarginBotto
 import BodySection from './components/BodySection/BodySection';
 import { appReducer, initialState, APP_ACTIONS } from './appReducer';
 
-const BASE_URL = 'http://localhost:5173';
-const ROUTES = {
-  courses: `${BASE_URL}/courses.json`,
-  notifications: `${BASE_URL}/notifications.json`,
+const API_BASE_URL = 'http://localhost:5173';
+const ENDPOINTS = {
+  courses: `${API_BASE_URL}/courses.json`,
+  notifications: `${API_BASE_URL}/notifications.json`,
 };
 
 const styles = StyleSheet.create({
@@ -26,46 +26,44 @@ const styles = StyleSheet.create({
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
-  // Load notifications when component mounts
   useEffect(() => {
-    const loadNotifications = async () => {
+    const fetchNotifications = async () => {
       try {
-        const res = await axios.get(ROUTES.notifications);
+        const response = await axios.get(ENDPOINTS.notifications);
         const latestNotif = {
           id: 3,
           type: "urgent",
           html: { __html: getLatestNotification() }
         };
 
-        const currentList = res.data.notifications;
-        const targetIdx = currentList.findIndex(
-          item => item.id === 3
+        const currentNotifications = response.data.notifications;
+        const indexToReplace = currentNotifications.findIndex(
+          notification => notification.id === 3
         );
 
-        const result = [...currentList];
-        if (targetIdx !== -1) {
-          result[targetIdx] = latestNotif;
+        const updatedNotifications = [...currentNotifications];
+        if (indexToReplace !== -1) {
+          updatedNotifications[indexToReplace] = latestNotif;
         } else {
-          result.push(latestNotif);
+          updatedNotifications.push(latestNotif);
         }
 
-        dispatch({ type: APP_ACTIONS.SET_NOTIFICATIONS, payload: result });
-      } catch (err) {
-        console.error('Failed to load notifications:', err);
+        dispatch({ type: APP_ACTIONS.SET_NOTIFICATIONS, payload: updatedNotifications });
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
       }
     };
 
-    loadNotifications();
+    fetchNotifications();
   }, []);
 
-  // Load courses when user logs in
   useEffect(() => {
-    const loadCourses = async () => {
+    const fetchCourses = async () => {
       try {
-        const res = await axios.get(ROUTES.courses);
-        dispatch({ type: APP_ACTIONS.SET_COURSES, payload: res.data.courses });
-      } catch (err) {
-        console.error('Failed to load courses:', err);
+        const response = await axios.get(ENDPOINTS.courses);
+        dispatch({ type: APP_ACTIONS.SET_COURSES, payload: response.data.courses });
+      } catch (error) {
+        console.error('Error fetching courses:', error);
       }
     };
 
@@ -74,7 +72,7 @@ export default function App() {
       return;
     }
 
-    loadCourses();
+    fetchCourses();
   }, [state.user.isLoggedIn]);
 
   const handleDisplayDrawer = useCallback(() => {

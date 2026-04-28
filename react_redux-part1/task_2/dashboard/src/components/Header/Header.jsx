@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     fontSize: "2.5rem",
     margin: 0,
   },
-  link: {
+  a: {
     fontFamily: "Roboto, sans-serif",
     fontSize: "1.2rem",
     marginLeft: "auto",
@@ -33,7 +33,7 @@ export default function Header({ user, logOut }) {
       <h1 className={css(styles.h1)}>School Dashboard</h1>
       {user.isLoggedIn ? (
         <div id="logoutSection" className={css(styles.logoutSection)}>
-          Welcome <b>{user.email}</b> <a className={css(styles.link)} href="#" onClick={logOut}>(logout)</a>
+          Welcome <b>{user.email}</b> <a className={css(styles.a)} href="#" onClick={logOut}>(logout)</a>
         </div>
       ) : null}
     </div>

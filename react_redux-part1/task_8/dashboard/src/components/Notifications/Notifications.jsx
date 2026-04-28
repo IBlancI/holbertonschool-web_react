@@ -1,23 +1,29 @@
 import { memo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import {
-  markNotificationAsRead,
-  showDrawer,
-  hideDrawer,
-} from "../../features/notifications/notificationsSlice";
 import { StyleSheet, css } from "aphrodite";
 import closeIcon from "../../assets/close-icon.png";
 import NotificationItem from "../NotificationItem/NotificationItem";
+import { markNotificationAsRead, showDrawer, hideDrawer } from '../../features/notifications/notificationsSlice'
+import { useDispatch, useSelector } from "react-redux";
 
-const opacityAnimation = {
-  from: { opacity: 0.5 },
-  to: { opacity: 1 },
+const opacityKeyframes = {
+  from: {
+    opacity: 0.5,
+  },
+  to: {
+    opacity: 1,
+  },
 };
 
-const bounceAnimation = {
-  "0%": { transform: "translateY(0px)" },
-  "50%": { transform: "translateY(-5px)" },
-  "100%": { transform: "translateY(5px)" },
+const bounceKeyframes = {
+  "0%": {
+    transform: "translateY(0px)",
+  },
+  "50%": {
+    transform: "translateY(-5px)",
+  },
+  "100%": {
+    transform: "translateY(5px)",
+  },
 };
 
 const styles = StyleSheet.create({
@@ -74,7 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff8f8",
     cursor: "pointer",
     ":hover": {
-      animationName: [opacityAnimation, bounceAnimation],
+      animationName: [opacityKeyframes, bounceKeyframes],
       animationDuration: "1s, 0.5s",
       animationIterationCount: "3, 3",
     },
@@ -82,49 +88,47 @@ const styles = StyleSheet.create({
 });
 
 const Notifications = memo(function Notifications() {
+  const { notifications, displayDrawer } = useSelector(state => state.notifications);
   const dispatch = useDispatch();
-  const { notifications, displayDrawer } = useSelector(
-    (state) => state.notifications
-  );
 
   const handleDisplayDrawer = () => {
     dispatch(showDrawer());
-  };
-
+  }
   const handleHideDrawer = () => {
     dispatch(hideDrawer());
-  };
-
-  const handleMarkAsRead = (id) => {
+  }
+  const handleMarkNotificationAsRead = (id) => {
     dispatch(markNotificationAsRead(id));
-  };
-
+  }
   return (
     <>
-      <div className={css(styles.menuItem)} onClick={handleDisplayDrawer}>
+      <div
+        className={css(styles.menuItem)}
+        onClick={() => handleDisplayDrawer()}
+      >
         Your notifications
       </div>
-      {displayDrawer && (
+      {displayDrawer ? (
         <div className={css(styles.notificationItems)}>
           {notifications.length > 0 ? (
             <>
               <p className={css(styles.p)}>Here is the list of notifications</p>
               <button
-                onClick={handleHideDrawer}
+                onClick={() => handleHideDrawer()}
                 aria-label="Close"
                 className={css(styles.button)}
               >
                 <img src={closeIcon} alt="close icon" />
               </button>
               <ul className={css(styles.ul)}>
-                {notifications.map((notif) => (
+                {notifications.map((notification) => (
                   <NotificationItem
-                    key={notif.id}
-                    id={notif.id}
-                    type={notif.type}
-                    value={notif.value}
-                    html={notif.html}
-                    markAsRead={handleMarkAsRead}
+                    id={notification.id}
+                    key={notification.id}
+                    type={notification.type}
+                    value={notification.value}
+                    html={notification.html}
+                    markAsRead={handleMarkNotificationAsRead}
                   />
                 ))}
               </ul>
@@ -133,6 +137,8 @@ const Notifications = memo(function Notifications() {
             <p className={css(styles.p)}>No new notifications for now</p>
           )}
         </div>
+      ) : (
+        []
       )}
     </>
   );

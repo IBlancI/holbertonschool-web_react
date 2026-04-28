@@ -1,7 +1,8 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../../features/auth/authSlice';
-import logo from '../../assets/holberton-logo.jpg';
+import logo from "../../assets/holberton-logo.jpg";
 import { StyleSheet, css } from "aphrodite";
+import { logout } from '../../features/auth/authSlice';
+import { useSelector, useDispatch } from 'react-redux';
+
 
 const styles = StyleSheet.create({
   header: {
@@ -20,23 +21,17 @@ const styles = StyleSheet.create({
     fontSize: "2.5rem",
     margin: 0,
   },
-  logoutSection: {
-    fontFamily: "Roboto, sans-serif",
-    fontSize: "1.2rem",
-    marginLeft: "auto",
-  },
   a: {
     fontFamily: "Roboto, sans-serif",
     fontSize: "1.2rem",
+    marginLeft: "auto",
     cursor: "pointer",
   },
 });
 
-
 export default function Header() {
+  const { user, isLoggedIn } = useSelector(state => state.auth);
   const dispatch = useDispatch();
-  const { isLoggedIn, user } = useSelector((state) => state.auth);
-
   const handleLogout = () => {
     dispatch(logout());
   };
